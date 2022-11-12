@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='Process some integers.')
   - argument_default: Các tham số mặc định truyền vào
 
 ```python
-Chẳng hạn ta có chương trình example.py:
+# Chẳng hạn ta có chương trình example.py:
 
 import argparse
 
@@ -28,7 +28,7 @@ args = parser.parse_args()
 print(args.accumulate(args.integers))
 
 
-Kết quả khi chạy python example.py --help:
+# Kết quả khi chạy python example.py --help:
 
 usage: prog.py [-h] [--sum] N [N ...]
 
