@@ -12,6 +12,29 @@ parser = argparse.ArgumentParser(description='Process some integers.')
   - add_help : Thêm cờ -h/--help cho chương trình để thiện phần thông tin trợ giúp
   - argument_default: Các tham số mặc định truyền vào
 
+
+```python
+import argparse
+# construct the argument parse and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-n", "--name", required=True,
+	help="name of the user")
+args = vars(ap.parse_args())
+print("Hi there {}, it's nice to meet you!".format(args["name"]))
+```
+- we add our only argument, --name . We must specify both shorthand (-n) and longhand versions (--name) where either flag could be used in the command line. This is a required argument as is noted by required=True
+
+
+
+
+
+
+
+
+
+
+
+
 Chẳng hạn ta có chương trình example.py:
 ```python
 
