@@ -12,8 +12,8 @@ parser = argparse.ArgumentParser(description='Process some integers.')
   - add_help : Thêm cờ -h/--help cho chương trình để thiện phần thông tin trợ giúp
   - argument_default: Các tham số mặc định truyền vào
 
+Chẳng hạn ta có chương trình example.py:
 ```python
-# Chẳng hạn ta có chương trình example.py:
 
 import argparse
 
@@ -26,10 +26,10 @@ parser.add_argument('--sum', dest='accumulate', action='store_const',
 
 args = parser.parse_args()
 print(args.accumulate(args.integers))
+```
 
-
-# Kết quả khi chạy python example.py --help:
-
+Kết quả khi chạy python example.py --help:
+```
 usage: prog.py [-h] [--sum] N [N ...]
 
 Process some integers.
@@ -44,12 +44,41 @@ optional arguments:
 ```
 
 Chức năng của các tham số:
-- 
+- metavar: Tên của tham số khi được ghi trong các phần thông tin trợ giúp (ở trong ví dụ là các đoạn usage: prog.py [-h] [--sum] N [N ...] và positional arguments: N an integer for the accumulator
+- type : Kiểu dữ liệu mà tham số truyền vào sẽ được ép thành (ở trong ví dụ là kiểu int)
+- help: Phần thông tin trợ giúp
+- dest: Tên của thuộc tính mà sẽ được thêm vào biến được trả về bởi parse_args(). dest ở trong ví dụ là accumulate, và bạn có thể thấy thuộc tính này được gọi sau này.
+- default: Giá trị mặc định trả về nếu không có biến nào được truyền vào từ CLI.
+- const: Một hằng giá trị ,không được truyền vào từ CLI nhưng vẫn được lưu bên trong để 1 số hàm bên trong sử dụng, nhất là hàm action
 
+Trong hàm add_argument, có 2 tham số đặc biệt cần lưu ý là nargs và action:
+- action: Mỗi tham số truyền vào CLI sẽ được lớp ArgumentParser đính với 1 action , tức là một hành động duy nhất. Tham số này sẽ định nghĩa cách các tham số truyền vào từ CLI được xử lý. Hành động này có nhiều kiểu như sau:
+  - 'store': hành động này sẽ lưu giá trị truyền vào. Đây là hành động mặc định
+  - 'store_const': hành động này sẽ lưu trữ giá trị được định nghĩa bởi từ khóa const. Như ở ví dụ trên, const đang truyền vào hàm sum. Biến này thường được dùng với các tham số dạng cờ. Ví dụ:
+  ```python
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--foo', action='store_const', const=42)
+  parser.parse_args(['--foo'])
+  Namespace(foo=42)
+  ```
+  - 'store_true' và 'store_false' : đây là dạng đặc biệt của action 'store_const', chuyên dùng để lưu các biến True và False, và đồng thời tạo các giá trị mặc định False và True.
+  - 'count': Đếm số lần một keyword argument xảy ra
+  - 'extend': Lưu 1 list, thêm các tham số truyền vào sau vào list đó.
 
+- nargs: Như đã nói ở trên thì mỗi tham số truyền vào CLI sẽ được lớp ArgumentParser đính với 1 action Tham số nargs có thể đính một số lượng các tham số khác nhau với 1 action. Các giá trị của nargs như sau:
+  - '*': Tất cả các tham số truyền vào từ CLI được gom lại vào 1 list
+  - '+': Giống như'*'. Nhưng sẽ trả ra 1 tin nhắn lỗi nếu không có tham số nào được truyền vào. Đây là giá trị được sử dụng ở ví dụ.
+  - N: Một số nguyên N các tham số truyền vaò từ CLI sẽ được gom vào một list
+  - ?: Sẽ chỉ có 1 tham số truyền vào từ CLI được xử lý. Nếu không có tham số nào thì giá trị từ tham số default sẽ được sử dụng.
 
+Hàm parse_args() biến các tham số được gửi vào từ CLI thành các thuộc tính của 1 object và trả về object đó. 
 
-
+```python
+parser.add_argument('--sum', dest='accumulate', action='store_const',
+                    const=sum, default=max,
+                    help='sum the integers (default: find the max)')
+```
+--> Thêm tham số --sum, được lưu vào thuộc tính accumulate, được dùng để tạo ra 1 hàm trả về tổng của các tham số truyền vào, hoặc nếu không có tham số --sum được truyền vào sẽ mặc định trả về giá trị lớn nhất.
 
 
 
