@@ -11,3 +11,27 @@ Các thành phần của Docker:
 - Docker Engine - được sử dụng để hình thành Docker images và tạo ra Docker container.
 - Docker Hub - đây là Registry được sử dụng để thao tác với các Docker images khác nhau.
 - Docker Compose - được sử dụng để định nghĩa các ứng dụng sử dụng multi-Docker container.
+
+# Một số lệnh Docker cơ bản:
+ 1. Kiểm tra phiên bản Docker:
+ ```docker
+ docker --version
+ ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
