@@ -34,7 +34,7 @@ Như vậy, một flow cơ bản của Git sẽ giống như sau:
 
 --> git có thêm staging area để cho phép lập trình nhóm những file đang sửa đổi, thêm, xóa ở working directory thành một tập hợp lý để commit. Trong một lần commit, dev không nên và không nhất thiết phải chọn tất cả các file / folder đang thay đổi ở trong working directory mà chỉ chọn nhóm file sửa một lỗi cụ thể, hoàn thành một task nhỏ cụ thể. Sau này khi cần undo sẽ không ảnh hưởng dây truyền đến các mã nguồn không liên đới.
 
-![alt text](https://github.com/maivan-hoa/Note/blob/main/images/1.png?raw=true)
+![alt text](https://github.com/maivan-hoa/Note/blob/main/images/1.PNG?raw=true)
 
 
 
