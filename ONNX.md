@@ -48,7 +48,9 @@ ONNX Runtime là bộ công cụ giúp tăng tốc training và inferencing mô 
 - Có thể train và inference mô hình đã tạo trên nhiều framework khác nhau
 
 `https://pytorch.org/tutorials/advanced/super_resolution_with_onnxruntime.html`
+
 ```python
+# onnx inference runtime
 import onnxruntime
 ort_session = onnxruntime.InferenceSession("cnn.onnx")
 
