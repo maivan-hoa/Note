@@ -13,8 +13,11 @@ Các thành phần của Docker:
 - Docker Compose - được sử dụng để định nghĩa các ứng dụng sử dụng multi-Docker container.
 
 `image` là một gói phần mềm trong đó chứa những thứ cần thiết như thư viện, file cấu hình, biến môi trường để chạy một ứng dụng nào đó
+
 Khi một phiên bản của image chạy, phiên bản chạy đó gọi là `container`
+
 Bất ký lúc nào bạn cũng có thể kiểm tra xem có bao nhiêu container đang chạy và nó sinh ra từ image nào.
+
 Bước đầu, để có image nào đó bạn tải về từ https://hub.docker.com/search?q=&type=image, tại đó có đủ các loại phù hợp với công việc của bạn!
 
 
@@ -30,6 +33,10 @@ hoặc lệnh thông tin chi tiết hơn:
 docker info
 ```
 
+2. Kiểm tra các `image` hiện đang có
+```
+docker images -a
+```
 
 
 
