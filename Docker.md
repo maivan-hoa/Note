@@ -12,12 +12,23 @@ Các thành phần của Docker:
 - Docker Hub - đây là Registry được sử dụng để thao tác với các Docker images khác nhau.
 - Docker Compose - được sử dụng để định nghĩa các ứng dụng sử dụng multi-Docker container.
 
+`image` là một gói phần mềm trong đó chứa những thứ cần thiết như thư viện, file cấu hình, biến môi trường để chạy một ứng dụng nào đó
+Khi một phiên bản của image chạy, phiên bản chạy đó gọi là `container`
+Bất ký lúc nào bạn cũng có thể kiểm tra xem có bao nhiêu container đang chạy và nó sinh ra từ image nào.
+Bước đầu, để có image nào đó bạn tải về từ https://hub.docker.com/search?q=&type=image, tại đó có đủ các loại phù hợp với công việc của bạn!
+
+
+
 # Một số lệnh Docker cơ bản:
  1. Kiểm tra phiên bản Docker:
  ```docker
  docker --version
  ```
 
+hoặc lệnh thông tin chi tiết hơn:
+```
+docker info
+```
 
 
 
