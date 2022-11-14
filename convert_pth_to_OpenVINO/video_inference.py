@@ -22,6 +22,61 @@ CLASSES = {
     6: 'Hoa'
 }
 
+class Model_classification():
+    def __init__(self, model_xml, model_bin):
+        self.model_xml = model_xml
+        self.model_bin = model_bin
+        ie = IECore()
+        net =  ie.read_network(model=model_xml, weights=model_bin)
+        self.input_blob = next(iter(net.input_info))
+        self.out_blob = next(iter(net.outputs))
+        self.exec_net =  ie.load_network(network=net, device_name="CPU")
+        
+        
+    def predict(self, input):
+        result_vector = self.exec_net.infer(inputs={self.input_blob: input})
+        result_vector = result_vector[self.out_blob]
+        return result_vector[0]
+    
+    
+class Model_detector():
+    def __init__(self, model_xml, model_bin):
+        self.model_xml = model_xml
+        self.model_bin = model_bin
+        ie = IECore()
+        net =  ie.read_network(model=model_xml, weights=model_bin)
+        self.input_blob = next(iter(net.input_info))
+        self.out_blob = next(iter(net.outputs))
+        self.exec_net =  ie.load_network(network=net, device_name="CPU")
+        self.n, self.c, self.h, self.w = net.input_info[self.input_blob].input_data.shape
+        
+    
+    def predict(self, input, conf=0.5):
+        h_origin, w_origin, _ = input.shape
+        corr_faces = []
+        input = cv2.resize(input, (self.w, self.h))
+        input = input.transpose((2, 0, 1))
+        input = input[np.newaxis, ...]
+        results = self.exec_net.infer(inputs={self.input_blob: input})
+        results = results[self.out_blob]
+        
+        for res in results[0, 0]:
+            if res[2] > conf:
+                # kết quả là tỷ lệ tọa độ khung hình đầu vào
+                x_min = max(res[3], 0)
+                y_min = max(res[4], 0)
+                x_max = max(res[5], 0)
+                y_max = max(res[6], 0)
+                
+                # convert sang tọa độ của ảnh gốc ban đầu
+                x1 = int(x_min * w_origin)
+                y1 = int(y_min * h_origin)
+                x2 = int(x_max * w_origin)
+                y2 = int(y_max * h_origin)
+                corr_faces.append((x1, y1, x2, y2))
+        return corr_faces
+    
+
 
 imgGlass = cv2.imread('./data/glasses_mask.png', 0)
 r = 160 / imgGlass.shape[1]
