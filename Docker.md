@@ -24,7 +24,7 @@ Bước đầu, để có image nào đó bạn tải về từ https://hub.dock
 
 # Một số lệnh Docker cơ bản:
  1. Kiểm tra phiên bản Docker:
- ```docker
+ ```shell
  docker --version
  ```
 
