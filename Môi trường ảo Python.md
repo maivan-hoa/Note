@@ -24,7 +24,7 @@ Quản lý các package như npm của NodeJS
 - Tạo virtual environment: `virtualenv my_env`
 --> This creates a folder in the current directory with the name of the environment (my_env/). This folder contains the directories for installing modules and Python executables.
 
-- Activate môi trường ảo: `source my_env/bin/activate`
+- Activate môi trường ảo: cd đến thư mục chứa môi trường ảo và chạy lệnh: `source my_env/bin/activate`
 --> sau khi kích hoạt môi trường ảo, tất cả những package được cài đặt mới sẽ nằm trong thư mục my_env/
 
 - Thoát khỏi môi trường ảo: `deactivate`
