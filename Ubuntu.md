@@ -102,10 +102,15 @@ shutdown -r now
 ```
 
 
+# Phân quyền trong Ubuntu
+## Quản lý người dùng, group
 
+- Thêm mới user
+- Tạo group
 
-
-
+## Phân quyền:
+- Có 3 nhóm yêu cầu quyền hạn truy cập là: `Owner`, `Group` và `Other`
+- Có 3 loại quyền hạn chính là `read`, `write` và `excute`
 
 
 
