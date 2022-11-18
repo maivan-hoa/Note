@@ -69,15 +69,30 @@ $ sudo apt-get install git
   - có thể sử dụng: `more tên_tệp`, `less tên_tệp`, `cat tên_tệp` 
   - 3 lệnh trên có một điểm khác nhau ở cách hiển thị tệp khi xem
 
+- `du` kiểm tra dung lượng của từng thư mục hay tập tin, thêm trường -h (human readable) cho phép hiển thị kích thước thư mục dưới dạng đơn vị mà con người dễ đọc như Kilobyte (K), Megabyte, Gigabyte
+  - `du -h`: hiện thị dung lượng các thư mục trong thư mực hiện hành
+  - `du -h đường_dẫn`: xem dung lượng của một thư mục cụ thể
+  - có thể kết hợp các tùy chọn -a (all file và thư mục), -s (file hoặc thư mục cụ thể),.. để hiển hiện theo cách mình muốn
+  ```
+  du -sh duong_dan
+  du -ah duong_dan
+  ```
+  - VD: Để kiểm tra dung lượng từng loại tệp tin cụ thể, ví dụ mình cần check dung lượng các file *.mp4 trong Videos. Mình dùng cd chuyển đến thư mục Videos (/home/gocinfo/Videos) và nhập lệnh: `du -sh *.mp4`
 
+- `who`: hiện thị về tài khoản người dùng hiện đang đăng nhập vào hệ thống. Để tham khảo thêm nhiều tùy chọn cho lệnh who. Hãy sử dụng lệnh man who trong terminal để xem thêm nữa
 
+- bạn có thể dùng lệnh cat để xem thông tin máy tính bằng cách đọc một file thông tin cấu hình máy tính ở đường dẫn /proc/cpuinfo  bằng lệnh cat như sau:
+```
+cat /proc/cpuinfo
+```
 
-
-
-
-
-
-
+- Khởi động lại máy tính: `shutdown -r` (reboot)
+- Tắt máy tính: `shutdown`
+- Nhưng thông thường các khi bạn sử dụng 2 lệnh trên, máy tính sẽ không tắt hay khởi động lại ngay mà đợi một tẹo nữa (1 phút sau). Để buộc máy tính tắt ngay hoặc khởi động lại ngay, bạn dùng lệnh:
+```
+shutdown now
+shutdown -r now
+```
 
 
 
