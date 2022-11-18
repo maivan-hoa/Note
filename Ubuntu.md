@@ -8,12 +8,19 @@ Do là một Linux distro, Ubuntu cũng tổ chức file và thư mục theo c�
 
 Một số thư mục chính:
 
-- /bin: Chứa các file binary của các command như ls, cd, mkdir, touch, rm, …
-- /boot: Chứa các file dùng để khởi động hệ thống (Linux kernel, RAM Disk Image, …)
-- /home: Thư mục home của người dùng. Mỗi user sẽ được cấp một thư mục riêng bên trong thư mục /home
-- /root: Thư mục home của super user
-- /sbin: Chứa file binary của các command chỉ có thể được dùng bởi superuser
-- …
+- `/` (hay computer) - Root - Thư mục gốc (khác với thư mục /root): Mọi file trong hệ thống của ubuntu đều bắt đầu từ nguồn này (đường dẫn bắt đầu bằng '/'). Chứa file hệ thống, các tệp tin cá nhân cũng như link tới các ổ đĩa cứng, mềm. Đại khái là chứa tất cả những thằng ở dưới đây.
+- `/bin`: (binary) Các tập tin thực thi của người dùng. Chứa các file là những lệnh của Linux cho cá nhân người sử dụng hoặc cho allusers. Các lệnh có thể lưu ở dạng mã nhị phân hoặc là .sh. Chạy được các command như ls, cd, mkdir, touch, rm, … đều do chúng được nhét ở trong thư mục này
+- `/boot`: Chứa các file dùng để khởi động hệ thống (Linux kernel, RAM Disk Image, …)
+- `/home`: Thư mục home của người dùng. Mỗi user sẽ được cấp một thư mục riêng bên trong thư mục /home
+- `/root`: Thư mục home của super user
+- `/sbin`: Các tập tin thực thi của hệ thống. Các lệnh trong file này là các lệnh dùng cho quản trị viên và thường dùng trong config hệ thống. Các lệnh trong file này thường chỉ có thể đường dùng bởi root hoặc superuser
+- `/etc` - Các tập tin cấu hình. Cấu hình trong file này thường sẽ ảnh hưởng đến tất cả người dùng trên hệ thống. Thường là config của các chương trình được cài đặt toàn cục.
+- `/dev` - Các tập tin thiết bị : Chứa tệp tin thiết bị được cho phép kết nối như usb hay các ổ đĩa cứng khác. Ngoài ra còn có 1 tệp tin đặc biệt là dev/null. Tệp tin này có ý nghĩa là không có gì. Khi ta nói chuyển 1 thư mục vào dev/null ta có thể hiểu là thư mục hay tệp tin sẽ bị xóa đi. Dev/null loại bỏ toàn bộ các dữ liệu ghi vào nó mà vẫn báo cáo là đã ghi thành công. (hay được thấy trong crontab)
+- `/proc` - thông tin về tiến trình: Các thông tin về hệ thống được biểu diễn dưới dạng file. Nó cung cấp cách thức cho nhân Linux để gửi và nhận thông tin từ các tiến trình đang chạy trên môi trường Linux.
+- `/var` - các tệp tin thay đổi: Chứa các tập tin mà dung lượng lớn dần theo thời gian sử dụng. Bao gồm – Các tập tin ghi chú về hệ thống (/var/log); các gói và các tập tin cơ sở dữ liệu (/var/lib); thư điện tử (/var/mail); hàng đợi in queues (/var/spool); các tập tin khóa (/var/lock); các tập tin tạm được dùng khi khởi động lại (/var/tmp).
+- `/tmp` - Chứa các tập tin tạm: Các tập tin tạm của hệ thống và người dùng để tăng tốc cho máy tính. Thường được xóa khi reboot.
+- `/lib` - Chứa các thư viện của hệ thống. Thông thường khi cài đặt các gói tin sẽ bao gồm các thư viện cài đặt thêm để hỗ trợ. Khi đó hệ thống sẽ sắp xếp các thư viện này vào cùng 1 chỗ để dễ dàng hơn khi gọi ra.
+- `/mnt` - Chứa các thư mục của các ổ cứng hay trong cùng 1 mạng.
 
 Để cài đặt phần mềm trên Ubuntu, các bạn có thể sử dụng Ubuntu Software Center. Cách sử dụng gần như y hệt khi bạn sử dụng App Store hay Google Play để cài ứng dụng di động
 
