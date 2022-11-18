@@ -27,10 +27,47 @@ $ sudo apt-get install git
 - Trợ giúp lệnh: `man [lệnh]`
 
 
+# Một số lệnh terminal thông dụng làm việc với file và thư mục Ubuntu
 
+- `pwd`: viết tắt của Print Working Directory, được sử dụng để in ra đường dẫn thư mục đang làm việc
+- `ls`: liệt kê ra nội dung trong thư mục hiện hành
+- `ls -a`: hiển thị tất cả file và thư mục, bao gồm cả file và thư mục ẩn (file và thư mục ẩn thường có dấu '.' ở trước tên)
 
+- `cd`: viết tắt của Change Direction, có nhiệm vụ thay đổi thư mục làm việc
+  - `../` là lùi một cấp thư mục
+  - Nếu tên thư mục có khoảng trắng, hãy gõ tên nó trong dấu " " hoặc ' '
+  
+- `dir`: có tác dụng như lệnh `ls`, nhưng `dir` chỉ liệt kê thư mục, không liệt kê các file khác
 
+- `touch`: là một lệnh trong Terminal dùng để thay đổi thời gian truy cập và sửa đổi file, nhưng nó cũng được dùng để tạo nhanh một file mới, với cú pháp như sau:
+  - `touch file1 file2 file3`
+  - Trong đó file1, file2, file3 là tên tệp bạn muốn tạo mới, các file được tạo thường là file văn bẳn dạng text rỗng.
+  
+- `cat`: một lệnh khác cũng được dùng để tạo file text, nhưng bạn sẽ được nhập dữ liệu vào file mới trực tiếp từ Terminal:
+  - `cat > tên_tệp`
+  - Để kết thúc việc nhập dữ liệu vào file bạn có thể nhấn tổ hợp phím Ctrl + D
+  
+- `rm`: xóa tệp
+  - `rm file1 file2 file3`
+  - Lưu ý: Lệnh rm không thể hoàn tác được, do đó để tránh trường hợp xóa nhầm file bạn có thể thêm tham số -i để được thông bảo hỏi trước khi xóa, cú pháp:
+  - `rm -i tên_file`
+  
+- `cp`: (copy) sao chép file cũng như thư mục:
+  - Sao chép tệp: `cp <tên_file_gốc> <tên_file_copy>`
+  - Sao chép tệp tin đến thư mục: `cp <file_gốc> <thư_muc/đường dẫn thư mục>`
+  - Sao chép thư mục đến thư mục: `cp <thư_mục> <thư_muc/đường_dẫn_thư_mục_lưu>`
+  
+- `mv`: (move) dùng để di chuyển file, thư mục hoặc dùng để đổi tên file
+  - `mv file1 file2`: Lệnh này có tác dụng di chuyển file1 đến file2, việc này cũng như đổi tên file1 thành file2 mà thôi.
+  - `mv <file> <thư_muc/đường_dẫn_thư_mục_lưu>`: di chuyển file đến đường dẫn hoặc thư mục nhất định
+  
+- `mkdir`: make directory, tạo thêm một hoặc nhiều thư mục mới: `mkdir thu_muc_1 thu_muc_2`
+- `rmdir`: remove directory, xóa bỏ một hoặc nhiều thư mục: `rmdir thu_muc_1 thu_muc_2`
+  - Lưu ý khi bạn xóa thư mục nào thì thư mục đó phải trống và bạn phải đang ở cùng vị trí với thư mục đó, nếu bạn đang ở trong thư mục cần xóa hoặc thư mục chứa tệp thì lệnh rmdir không thưc hiện được.
 
+- Xem, đọc tệp trên Terminal:
+  - có thể sử dụng: `more tên_tệp`, `less tên_tệp`, `cat tên_tệp` 
+  - 3 lệnh trên có một điểm khác nhau ở cách hiển thị tệp khi xem
 
 
 
