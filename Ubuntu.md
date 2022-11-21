@@ -74,6 +74,8 @@ Trong đó:
   - `rm file1 file2 file3`
   - Lưu ý: Lệnh rm không thể hoàn tác được, do đó để tránh trường hợp xóa nhầm file bạn có thể thêm tham số -i để được thông bảo hỏi trước khi xóa, cú pháp:
   - `rm -i tên_file`
+  - `rm your/dir/*.log`: xóa toàn bộ file có đuôi .log
+  - `rm /your/dir/*bak*.log`: file chỉ cần chứa _bak_ và là file log thì sẽ bị xóa
   
 - `cp`: (copy) sao chép file cũng như thư mục:
   - Sao chép tệp: `cp <tên_file_gốc> <tên_file_copy>`
@@ -167,11 +169,15 @@ shutdown -r now
 
 `opcode` có thể là 3, 4 chữ số hoặc chữ cái như biểu diễn ở hình dưới:
 
-<div align="center"><img src="https://github.com/maivan-hoa/Note/blob/main/images/ubuntu3.png?raw=true" width="500"></div> 
+<div align="center"><img src="https://github.com/maivan-hoa/Note/blob/main/images/ubuntu3.png?raw=true" width="800"></div> 
 
+- Giả sử với lệnh: `chmod -R 765 laravel/storage` có nghĩa là:
+  - Owner tương ứng với số 7 (như hình vẽ sẽ có đủ 3 quyền đọc, ghi, thực thi) như vậy owner hiện tại có thể làm bất cứ điều gì với thư mục này.
+  - Group owner tương ứng với số 6 ( như hình vẽ sẽ có 2 quyền là đọc và ghi) tức là các user thuộc group (group này thường là group hiện tại mà user thực thi câu lệnh đang ở trong, thông thường hay ghi tên user vì khi tạo 1 user thì cũng có 1 group có tên như vậy được tạo ra) có quyền đọc và ghi với thư mục này. (Bạn có thể thay đổi group owner cho thư mục)
+  - Cuối cùng là số 5 tương ứng với other (ở đây là tất cả các thằng user hay group khác trong hệ thống) như hình vẽ sẽ có quyền đọc và thực thi.
 
-
-
+- Với trường hợp chữ cái: `chmod u+x laravel/storage`
+  - tức là thêm quyền excute cho thằng owner của thư mục.
 
 
 
