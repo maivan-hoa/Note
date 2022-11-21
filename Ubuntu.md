@@ -30,6 +30,22 @@ $ sudo apt-get update
 $ sudo apt-get install git
 ```
 
+- Khi mở Terminal, trên giao diện sẽ xuất hiện:
+```
+A @ B : C D
+```
+Ví dụ:
+```
+root@ubuntu-ssh-njzhg:~#
+```
+Trong đó:
+  - A: tên người dùng đang đăng nhập
+  - B: là hostname (Hostname là tên được gán cho thiết bị (được gọi là host) trên mạng và được sử dụng để phân biệt thiết bị này với thiết bị khác trên mạng cụ thể hoặc qua Internet. Để hiểu đơn giản hơn hostname là gì? Bạn hãy hiểu hostnam là 1 cụm ký tự chỉ tên của máy chủ )
+  - C: sẽ là ký tự `~` khi bạn đang ở thư mục home của mình, nó sẽ chuyển thành `/` khi bạn ở thư mục gốc (thư mục `/`, không phải `/root`)
+  - D: sẽ là ký tự `$` khi bạn đang sử dụng quyền của người dùng bình thường, khi bạn sử dụng quyền của root để cài đặt phần mềm hay thay đổi hệ thống, `$` sẽ đổi thành `#` 
+
+
+
 - Chạy lệnh trên Ubuntu có dạng: `command [options][arguments]`
 - Trợ giúp lệnh: `man [lệnh]`
 
@@ -104,16 +120,49 @@ shutdown -r now
 
 # Phân quyền trong Ubuntu
 ## Quản lý người dùng, group
+- User chính là người có thể truy cập đến hệ thống. Một User có username và password. Có hai loại User là Super User (hay thường gọi là Root) và Regular User. Mỗi User còn có một mã UID riêng. Mỗi loại User và mỗi User khác nhau có quyền trong hệ thống khác nhau phụ thuộc vào hệ thống đã thiết lập cho họ những quyền gì, Super User đã cấp cho họ những quyền gì.
+- Group là nhóm người dùng hệ thống. Mỗi nhóm có tên và mã GID riêng. Các User trong Group có thể có những quyền trong hệ thống khác nhau nhưng có một tập hợp quyền chung trong hệ thống đặc trưng cho Group đó.
 
-- Thêm mới user
-- Tạo group
+- Thêm mới/tạo user: `useradd [option] <username>`, với:
+  - -c <Thông tin người dùng>
+  - -d <Thư mục cá nhân>
+  - -m : Tạo thư mục cá nhân nếu chưa tồn tại
+  - -g <nhóm của người dùng>
+
+- Thay đổi thông tin cá nhân của user: `usermod [option] <username>`
+- Xóa user: `userdel [option] <username>`
+- Đặt mật khẩu cho user: `sudo passwd <username>`
+- Các quy định cho password trong file `/etc/login.defs.`
+- Khóa user: `passwd -l <username>`
+- Mở khóa user: `passwd -u <username>`
+
+- Tạo group: `groupadd <ten_group>`
+- Để tạo mới 1 user và thêm luôn vào group ta sử dụng lệnh: `sudo useradd -G <tên_group> <tên_user>`
+- Còn nếu muốn thêm 1 user có sẵn vào group sử dụng lệnh: `sudo usermod -a -G <tên_group> <tên_user>`
+- Để xóa 1 group ta sử dụng lệnh: `groupdel <tên_group>`
+
 
 ## Phân quyền:
 - Có 3 nhóm yêu cầu quyền hạn truy cập là: `Owner`, `Group` và `Other`
-- Có 3 loại quyền hạn chính là `read`, `write` và `excute`
+- Một file hay một thư mục trong hệ thống có 4 loại quyền hạn chính là `read`, `write`, `excute` và `deny`:
+  - Read (r): Đối với một file thì quyền Read chính là quyền được xem nội dung của file, còn đối với một folder thì quyền Read chính là quyền xem được danh sách các subfolder và file bên trong folder đó.
+  - Write (w): Đối với một file thì quyền Write là cho phép thêm, sửa nội dùng file, còn đối với một folder thì Write cho phép thêm, xóa một subfolder hay file trong thư mục đó.
+  - Execute (x): Đây là quyền thực thi. Đối với một file thì Execute cho phép thực thi file trong trường hợp file này thuộc dạng program hoặc script, còn đối với một folder Execute cho phép cd vào thư mục này.
+  - Deny (-): Không có quyền làm một thao tác gì đó đối với một file hay folder xác định.
 
+- Thường sẽ sử dụng 10 bits để thể hiện quyền hạn:
+  - Bit 1: thể hiện kiểu file, “d” cho biết đó là thư muc, “-” cho biết đó là 1 file thường.
+  - 9 bits còn lại: chia làm 3 nhóm, mỗi nhóm thể hiện quyền hạn cho mỗi loại đối tượng.
+    - Ba bít đầu thể hiện quyền của owner - user sở hữu file này
+    - Ba bít tiếp theo thể hiện quyền của owner group - group sở hữu file này
+    - Ba bit cuối thể hiện quyền của các user khác
 
-
+- Chỉ có User có quyền root hoặc owner user của file mới có thể thay đổi quyền của file đó. Câu lệnh hay được sử dụng nhất là `chmod`, cú pháp câu lệnh này là: `chmod <option> <opcode> <path_to_file>`, với `option` bao gồm:
+  - -v: hiển thị báo cáo sau khi chạy lệnh. Nếu bạn chmod nhiều file/folder cùng lúc thì cứ mỗi lần nó đổi quyền của 1 file/folder xong là sẽ hiện báo cáo.
+  - -c: giống như trên, nhưng chỉ hiện khi nó đã làm xong tất cả.
+  - -f: Hiểu ngắn gọn là kiểu “kemeno”, nếu có lỗi xảy ra nó cũng không thông báo.
+  - -R: nếu bạn CHMOD một folder thì kèm theo -R nghĩa là áp dụng luôn vào các file/folder nằm bên trong nó.
+  - --help: hiển thị thông báo trợ giúp.
 
 
 
