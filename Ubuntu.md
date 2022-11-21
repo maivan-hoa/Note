@@ -121,6 +121,7 @@ shutdown -r now
 # Phân quyền trong Ubuntu
 ## Quản lý người dùng, group
 - User chính là người có thể truy cập đến hệ thống. Một User có username và password. Có hai loại User là Super User (hay thường gọi là Root) và Regular User. Mỗi User còn có một mã UID riêng. Mỗi loại User và mỗi User khác nhau có quyền trong hệ thống khác nhau phụ thuộc vào hệ thống đã thiết lập cho họ những quyền gì, Super User đã cấp cho họ những quyền gì.
+- Mỗi user có một thư mục home riêng, khi đăng nhập sẽ vào thư mục tương ứng của mình
 - Group là nhóm người dùng hệ thống. Mỗi nhóm có tên và mã GID riêng. Các User trong Group có thể có những quyền trong hệ thống khác nhau nhưng có một tập hợp quyền chung trong hệ thống đặc trưng cho Group đó.
 
 - Thêm mới/tạo user: `useradd [option] <username>`, với:
@@ -164,7 +165,9 @@ shutdown -r now
   - -R: nếu bạn CHMOD một folder thì kèm theo -R nghĩa là áp dụng luôn vào các file/folder nằm bên trong nó.
   - --help: hiển thị thông báo trợ giúp.
 
+`opcode` có thể là 3, 4 chữ số hoặc chữ cái như biểu diễn ở hình dưới:
 
+<div align="center"><img src="https://github.com/maivan-hoa/Note/blob/main/images/ubuntu3.png?raw=true" width="500"></div> 
 
 
 
