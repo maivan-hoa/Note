@@ -90,8 +90,9 @@ Trong đó:
 - `mv`: (move) dùng để di chuyển file, thư mục hoặc dùng để đổi tên file
   - `mv file1 file2`: Lệnh này có tác dụng di chuyển file1 đến file2, việc này cũng như đổi tên file1 thành file2 mà thôi.
   - `mv <file> <thư_muc/đường_dẫn_thư_mục_lưu>`: di chuyển file đến đường dẫn hoặc thư mục nhất định
-  
+  - `mv <file1> <thư_muc/đường_dẫn_thư_mục_lưu> && mv <file2> <thư_muc/đường_dẫn_thư_mục_lưu>`: di chuyển nhiều file
 - `mkdir`: make directory, tạo thêm một hoặc nhiều thư mục mới: `mkdir thu_muc_1 thu_muc_2`
+  - Thêm option `-p` sẽ tạo thư mục nhiều cấp: `mkdir -p /a/b/c`
 - `rmdir`: remove directory, xóa bỏ một hoặc nhiều thư mục: `rmdir thu_muc_1 thu_muc_2`
   - Lưu ý khi bạn xóa thư mục nào thì thư mục đó phải trống và bạn phải đang ở cùng vị trí với thư mục đó, nếu bạn đang ở trong thư mục cần xóa hoặc thư mục chứa tệp thì lệnh rmdir không thưc hiện được.
 
