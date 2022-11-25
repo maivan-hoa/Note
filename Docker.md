@@ -58,10 +58,36 @@ Bất ký lúc nào bạn cũng có thể kiểm tra xem có bao nhiêu containe
 
 Bước đầu, để có image nào đó bạn tải về từ https://hub.docker.com/search?q=&type=image, tại đó có đủ các loại phù hợp với công việc của bạn!
 
+### Kiến trúc và các thành phần của docker
+1. Docker Engine
+- Docker Engine là một ứng dụng client-server. Có hai phiên bản Docker Engine phổ biến là:
+	- Docker Community Edition (CE): Là phiên bản miễn phí và chủ yếu dựa vào các sản phầm nguồn mở khác.
+	- Docker Enterprise: Khi sử dụng phiên bản này bạn sẽ nhận được sự support của nhà phát hành, có thêm các tính năng quản lý và security
+
+- Các thành phần chính của Docker Engine gồm có:
+	- Server hay còn được gọi là docker daemon (dockerd): chịu trách nhiệm tạo, quản lý các Docker objects như images, containers, networks, volume.
+	- REST API: docker daemon cung cấp các api cho Client sử dụng để thao tác với Docker
+	- Client là thành phần đầu cuối cung cấp một tập hợp các câu lệnh sử dụng api để người dùng thao tác với Docker. (Ví dụ docker images, docker ps, docker rmi image v.v..)
+	
+	<div align="center"><img src="https://github.com/maivan-hoa/Note/blob/main/images/docker2.png?raw=true" width="500"></div> 
+
+2. Kiến trúc của Docker
+Docker sử dụng kiến trúc client-server. Docker server (hay còn gọi là daemon) sẽ chịu trách nhiệm build, run, distrubute Docker container. Docker client và Docker server có thể nằm trên cùng một server hoặc khác server. Chúng giao tiếp với nhau thông qua REST API dựa trên UNIX sockets hoặc network interface.
+- Docker daemon (dockerd) là thành phần core, lắng nghe API request và quản lý các Docker object. Docker daemon host này cũng có thể giao tiếp được với Docker daemon ở host khác.
+- Docker client (docker) là phương thức chính để người dùng thao tác với Docker. Khi người dùng gõ lệnh docker run imageABC tức là người dùng sử dụng CLI và gửi request đến dockerd thông qua api, và sau đó Docker daemon sẽ xử lý tiếp.
+- Docker registry là một kho chứa các Image. Nổi tiếng nhất chính là Docker Hub, ngoài ra bạn có thể tự xây dựng một Docker registry cho riêng mình.
+
+<div align="center"><img src="https://github.com/maivan-hoa/Note/blob/main/images/docker3.png?raw=true" width="700"></div> 
+
 
 
 # Một số lệnh Docker cơ bản:
- 1. Kiểm tra phiên bản Docker:
+0. Tìm kiếm images
+```
+docker search <name_image>
+```
+
+1. Kiểm tra phiên bản Docker:
  ```shell
  docker --version
  ```
@@ -100,10 +126,13 @@ docker run --name <container_name> -it --rm -p 8888:8888 -v $PWD:/tmp -w /tmp <i
 - `-p {host_port}:{container_port}`: tùy chọn mapping port giữa host và container
 - `-v {host_directory}:{container_directory}`: là lệnh mount volumn giữa host với container. Trong lệnh trên chúng ta đã mount `current directory` trên host với thư mục `/tmp` của container. Sau khi mount thì dữ liệu giữa hai thư mục sẽ như nhau.
 - `-w` thay đổi thư mục làm việc của container về `/tmp`.
+- Khi chạy container nếu Image không có sẵn trong Docker host thì Docker sẽ tự động tải từ Registry về Docker host trước (tag mặc định là lastest).
 
 6. Liệt kê danh sách các container đang chạy
 ```
 docker container ls
+# or
+docker ps
 ```
 
 7. Xóa một container
@@ -120,7 +149,8 @@ docker container rm <container_name>
 - Có rất nhiều cách khác nhau để khởi tạo một docker image như sử dụng DockerFile; thông qua git repository; context đã được đóng gói sẵn trong các file tar.gz, xz, bzip2 gzip hoặc folder.
 
 ### Build image từ Dockerfile
-- Dockerfile là một file quy định các lệnh cần thiết để docker engine build một image như FROM, COPY, RUN, EXPOSE
+- Dockerfile là một file dạng text không có extension, và tên bắt buộc phải là Dockerfile
+- Dockerfile là một file kịch bản sử dụng để tạo mới một image, quy định các lệnh cần thiết để docker engine build một image như FROM, COPY, RUN, EXPOSE
 ```
 docker build -t <image_name:tag> .
 ```
@@ -144,7 +174,7 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 
 ## Các lệnh trong file Dockerfile
 - `FROM`: Lệnh này thường được sử dụng đầu Dockerfile để khởi tạo một build stage từ base image. Base image được lấy từ Dockerhub - Repository thường là những image có kích thước rất nhẹ và phù hợp với mục đích mà ta cần build.
-- `RUN`: Sẽ thực thi các lệnh terminal trong quá trình build image. Có thể có nhiều lệnh `RUN` liên tiếp nhau.
+- `RUN`: thực hiện một câu lệnh Linux. Tùy vào image gốc mà có các câu lệnh tương ứng. Sẽ thực thi các lệnh terminal trong quá trình build image. Có thể có nhiều lệnh `RUN` liên tiếp nhau.
 	- Chẳng hạn:
 	```
 	RUN apt-get update 
@@ -162,14 +192,15 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
  - Trong quá trình build một image thì mỗi lệnh RUN trong Dockerfile sẽ build thành một layer. Các layer sẽ giúp caching quá trình build và khi re-build sẽ nhanh hơn vì chỉ phải build lại bắt đầu từ dòng lệnh bị thay đổi và tận dụng các phần trước đó đã được caching.
  - Khi tách một lệnh RUN ghép thành nhiều lệnh RUN đơn, chúng ta sẽ có nhiều layer caching hơn và quá trình build sẽ nhanh hơn. Ví dụ trong 2 cách chạy lệnh RUN để thực hiện cùng một tác vụ như trên thì với cách chạy thứ 2 chúng ta sẽ phải chạy lại toàn bộ lệnh mỗi khi có một trong ba lệnh con thay đổi. Nhưng với cách chạy đầu tiên thì các lệnh sau thay đổi sẽ chỉ phải build lại từ dòng lệnh đó trở đi vì các dòng lệnh trước đã được lấy lại từ caching.
 
-- `LABEL`: Cung cấp thông tin về metadata cho image như tác giả, email, công ty,…
-- `EXPOSE`: Thiết lập port để access container sau khi nó khởi chạy.
-- `COPY`: Cú pháp chung của lệnh là này là `COPY <src> <dest>`. Lệnh này nhằm copy thư mục từ host (là máy mà chúng ta cài docker image) vào container. Ví dụ trên máy chúng ta có thư mục host_dir. Chúng ta muốn copy vào container tại địa chỉ tuyệt đối /app/.
+- `LABEL`: Cung cấp thông tin về metadata cho image như tác giả, email, công ty,…. Để xem được các label này sử dụng câu lệnh `docker inspect <IMAGE ID>`
+- `MAINTERNER`: là author (tác giả) build image đó
+- `EXPOSE`: Thiết lập port để access container sau khi nó khởi chạy. (chỉ định các port sẽ Listen trong container khi khởi chạy container từ image)
+- `COPY`: Cú pháp chung của lệnh là này là `COPY <src> <dest>`. Lệnh này nhằm copy thư mục từ host (là máy mà chúng ta cài docker image) vào image trong quá trình build image. Ví dụ trên máy chúng ta có thư mục host_dir. Chúng ta muốn copy vào image tại địa chỉ tuyệt đối /app/.
 	- `COPY /host_dir /app/`
 	- Note: Nếu chúng ta lấy đường dẫn của `<dest>` là `/folder/` thì đây là đường dẫn tuyệt đối xuất phát từ `root`. Còn nếu chúng ta lấy đường dẫn của `<dest>` là `folder/` thì nó được xem như đường dẫn tương đối bắt đầu từ `<WORK_DIR>/folder/`. Đây là một kiến thức cơ bản nhưng lại là một trong những nguyên nhân gây lỗi khi build.
 
 - `ADD`: `ADD` cũng làm nhiệm vụ tương tự như `COPY` nhưng nó hỗ trợ thêm 2 tính năng nữa là copy từ một link URL trực tiếp vào container và thứ hai là bạn có thể extract một tar file trực tiếp vào container.
-- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
+- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Dùng để truyền một Linux command khi khởi tạo container từ image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
 	- Chẳng hạn chúng ta muốn khi run docker thì sẽ in ra địa chỉ `$HOME`. Chúng ta có thể thêm dòng lệnh:
 	```
 	CMD ["echo", "$HOME"]
@@ -178,6 +209,11 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 
 - `ENTRYPOINT`: Cung cấp các lệnh mặc định cùng tham số khi thực thi container. Lệnh `CMD` và `ENTRYPOINT` sẽ có chức năng giống nhau, ngoại trừ `ENTRYPOINT` có thể lặp lại nhiều lần trong một Dockerfile trong khi `CMD` là duy nhất.
 - `ENV`: Thiết lập các biến environment cho docker image. Giá trị này sẽ tồn tại trong toàn bộ các build stage.
+	```
+	ENV source /var/www/html/
+	COPY index.html ${source}
+	```
+	- `ENV` chỉ có thể được sử dụng trong các command sau: ADD, COPY, ENV, EXPOSE, FROM, LABEL, STOPSIGNAL, USER, VOLUME, WORKDIR
 - `VOLUME`: Mount folder từ máy host tới container.
 - `WORKDIR`: thay đổi thư mục làm việc hiện hành cho các lệnh thực thi như `RUN`, `CMD`, `ENTRYPOINT`, `COPY`, `ADD` ở phía sau nó. Lệnh này cũng giống như cd trong linux.
 - `ONBUILD`: Tạo một trigger như là một điểm chờ cho việc build image. Các lệnh phía sau lệnh `ONBUILD` sẽ không được thực thi cho đến khi image đó được sử dụng làm base image cho việc build một image khác thì các lệnh sau `ONBUILD` sẽ được được thực thi theo tuần tự.
