@@ -71,10 +71,116 @@ hoặc lệnh thông tin chi tiết hơn:
 docker info
 ```
 
-2. Kiểm tra các `image` hiện đang có
+2. Pull docker image từ docker hub:
 ```
-docker images -a
+docker pull <image_name:tag>
 ```
+- `image_name`: là tên của docker image trên docker hub và tag là nhãn đánh dấu phiên bản của docker image. Mặt định không điền nhãn thì sẽ download bản `lasted`
+
+3. Liệt kê danh sách các `image` hiện đang có
+```
+docker images
+```
+- Cột IMAGE ID chính là index của image và là duy nhất, xóa một image sẽ dựa trên image id
+
+4. Xóa một image
+```
+docker rmi <image_id>
+#or
+docker image rm <image_id>
+```
+
+5.  Run một docker image
+```
+docker run --name <container_name> -it --rm -p 8888:8888 -v $PWD:/tmp -w /tmp <image_name>
+```
+- `container_name`: tên của container sau khi được khởi tạo. Nếu không thiết lập tên thì docker sẽ sinh ra một tên mặc định cho nó.
+- `-it`: là lựa chọn bắt buộc khi run docker với interactive process (chẳng hạn shell)
+- `--rm`: sẽ xóa container sau khi exit docker
+- `-p {host_port}:{container_port}`: tùy chọn mapping port giữa host và container
+- `-v {host_directory}:{container_directory}`: là lệnh mount volumn giữa host với container. Trong lệnh trên chúng ta đã mount `current directory` trên host với thư mục `/tmp` của container. Sau khi mount thì dữ liệu giữa hai thư mục sẽ như nhau.
+- `-w` thay đổi thư mục làm việc của container về `/tmp`.
+
+6. Liệt kê danh sách các container đang chạy
+```
+docker container ls
+```
+
+7. Xóa một container
+```
+docker container rm <container_name>
+```
+- Bình thường nếu chúng ta thêm argument `--rm` vào lệnh docker run thì container sẽ tự động remove sau khi exit. Nếu không thêm lựa chọn này thì container sẽ vẫn tồn tại và chiếm dụng tài nguyên của máy. Khi đó có thể xóa chúng bằng lệnh.
+- Trong đó `container_name` chính là cột `NAMES` mà chúng ta thấy ở lệnh docker `container ls`.
+
+
+# Build docker
+## Build một image
+- Để build một docker image, chúng ta sử dụng lệnh docker build. Lệnh này sẽ xây dựng image từ Dockerfile và context. Context ở đây được hiểu là tập hợp các tệp nằm trong PATH hoặc URL được chỉ định
+- Có rất nhiều cách khác nhau để khởi tạo một docker image như sử dụng DockerFile; thông qua git repository; context đã được đóng gói sẵn trong các file tar.gz, xz, bzip2 gzip hoặc folder.
+
+### Build image từ Dockerfile
+- Dockerfile là một file quy định các lệnh cần thiết để docker engine build một image như FROM, COPY, RUN, EXPOSE
+```
+docker build -t <image_name:tag> .
+```
+- Dấu `.` là đại diện cho thư mục hiện hành, nơi chứa Dockerfile và các file context để build image
+- VD: build một image in ra dòng hello world:
+ - Tạo file hello.txt: `echo "hello world" > hello.txt`
+ - Tạo file Dockerfile có nội dung:
+ ```
+ from busybox
+ copy hello.txt /
+ run cat hello.txt
+ ```
+ - Tại cùng thư mục, gõ lệnh build: `docker build -t hello:v1 .`
+ 
+### Build image từ context
+- Giả sử file Dockerfile đang nằm trong thư mục dockerfiles và file hello.txt đang nằm trong thư mục context
+- Build image từ các file context phân tán:
+```
+docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
+```
+
+## Các lệnh trong file Dockerfile
+- `FROM`: Lệnh này thường được sử dụng đầu Dockerfile để khởi tạo một build stage từ base image. Base image được lấy từ Dockerhub - Repository thường là những image có kích thước rất nhẹ và phù hợp với mục đích mà ta cần build.
+- `RUN`: Sẽ thực thi các lệnh terminal trong quá trình build image. Có thể có nhiều lệnh `RUN` liên tiếp nhau.
+ - Chẳng hạn:
+ ```
+ RUN apt-get update 
+ RUN apt-get install -y package-bar package-baz package-foo 
+ RUN rm -rf /var/lib/apt/lists/*
+ ```
+ - Một lệnh RUN dài có thể xuống dòng để dễ đọc, dễ hiểu hơn bằng ký hiệu blash `\`:
+ ```
+ RUN apt-get update && apt-get install -y \
+    package-bar \
+    package-baz \
+    package-foo  \
+    && rm -rf /var/lib/apt/lists/*
+ ```
+ - Trong quá trình build một image thì mỗi lệnh RUN trong Dockerfile sẽ build thành một layer. Các layer sẽ giúp caching quá trình build và khi re-build sẽ nhanh hơn vì chỉ phải build lại bắt đầu từ dòng lệnh bị thay đổi và tận dụng các phần trước đó đã được caching.
+ - Khi tách một lệnh RUN ghép thành nhiều lệnh RUN đơn, chúng ta sẽ có nhiều layer caching hơn và quá trình build sẽ nhanh hơn. Ví dụ trong 2 cách chạy lệnh RUN để thực hiện cùng một tác vụ như trên thì với cách chạy thứ 2 chúng ta sẽ phải chạy lại toàn bộ lệnh mỗi khi có một trong ba lệnh con thay đổi. Nhưng với cách chạy đầu tiên thì các lệnh sau thay đổi sẽ chỉ phải build lại từ dòng lệnh đó trở đi vì các dòng lệnh trước đã được lấy lại từ caching.
+
+- `LABEL`: Cung cấp thông tin về metadata cho image như tác giả, email, công ty,…
+- `EXPOSE`: Thiết lập port để access container sau khi nó khởi chạy.
+- `COPY`: Cú pháp chung của lệnh là này là `COPY <src> <dest>`. Lệnh này nhằm copy thư mục từ host (là máy mà chúng ta cài docker image) vào container. Ví dụ trên máy chúng ta có thư mục host_dir. Chúng ta muốn copy vào container tại địa chỉ tuyệt đối /app/.
+ - `COPY /host_dir /app/`
+ - Note: Nếu chúng ta lấy đường dẫn của `<dest>` là `/folder/` thì đây là đường dẫn tuyệt đối xuất phát từ `root`. Còn nếu chúng ta lấy đường dẫn của `<dest>` là `folder/` thì nó được xem như đường dẫn tương đối bắt đầu từ `<WORK_DIR>/folder/`. Đây là một kiến thức cơ bản nhưng lại là một trong những nguyên nhân gây lỗi khi build.
+
+- `ADD`: `ADD` cũng làm nhiệm vụ tương tự như `COPY` nhưng nó hỗ trợ thêm 2 tính năng nữa là copy từ một link URL trực tiếp vào container và thứ hai là bạn có thể extract một tar file trực tiếp vào container.
+- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
