@@ -66,9 +66,14 @@ Trong đó:
   - `touch file1 file2 file3`
   - Trong đó file1, file2, file3 là tên tệp bạn muốn tạo mới, các file được tạo thường là file văn bẳn dạng text rỗng.
   
-- `cat`: một lệnh khác cũng được dùng để tạo file text, nhưng bạn sẽ được nhập dữ liệu vào file mới trực tiếp từ Terminal:
+- `cat`: một lệnh khác cũng được dùng để tạo file text, nhưng bạn sẽ được nhập dữ liệu vào file mới trực tiếp từ Terminal. Lệnh này cũng được sử dụng để xem nội dung file, ghi dữ liệu vào file khác:
   - `cat > tên_tệp`
-  - Để kết thúc việc nhập dữ liệu vào file bạn có thể nhấn tổ hợp phím Ctrl + D
+  - Để kết thúc việc nhập dữ liệu vào file bạn có thể nhấn tổ hợp phím `Ctrl + D`
+  - `cat filename.txt`: mở file và hiển thị nội dung cho bạn ngay
+  - `cat filename.txt | more`: Để hạn chế cuộc file quá lớn, bạn có thể dùng `| more` để xuất kết quả ít hơn
+  - `cat *.txt`: hiển thị nội dung của nhiều hơn một file. Ví dụ, để hiển thị toàn bộ nội dung của file text
+  - `cat source.txt > destination.txt`: Thay vì hiển thị nội dung trong một file, bạn còn có thể chuyển hướng kết quả vào một file khác với option `>`. Nếu file đích không có sẵn, lệnh này sẽ tự tạo file đó ra. Hoặc ghi đè lên file có cùng tên.
+  - `cat source.txt >> destination.txt`: Để ghi nội dung vào trong cuối file, hãy sử dụng dấu `>>`
   
 - `rm`: xóa tệp
   - `rm file1 file2 file3`
