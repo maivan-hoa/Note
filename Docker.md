@@ -126,14 +126,14 @@ docker build -t <image_name:tag> .
 ```
 - Dấu `.` là đại diện cho thư mục hiện hành, nơi chứa Dockerfile và các file context để build image
 - VD: build một image in ra dòng hello world:
- - Tạo file hello.txt: `echo "hello world" > hello.txt`
- - Tạo file Dockerfile có nội dung:
- ```
- from busybox
- copy hello.txt /
- run cat hello.txt
- ```
- - Tại cùng thư mục, gõ lệnh build: `docker build -t hello:v1 .`
+	- Tạo file hello.txt: `echo "hello world" > hello.txt`
+	- Tạo file Dockerfile có nội dung:
+	```
+	from busybox
+	copy hello.txt /
+	run cat hello.txt
+	```
+	- Tại cùng thư mục, gõ lệnh build: `docker build -t hello:v1 .`
  
 ### Build image từ context
 - Giả sử file Dockerfile đang nằm trong thư mục dockerfiles và file hello.txt đang nằm trong thư mục context
@@ -145,35 +145,61 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 ## Các lệnh trong file Dockerfile
 - `FROM`: Lệnh này thường được sử dụng đầu Dockerfile để khởi tạo một build stage từ base image. Base image được lấy từ Dockerhub - Repository thường là những image có kích thước rất nhẹ và phù hợp với mục đích mà ta cần build.
 - `RUN`: Sẽ thực thi các lệnh terminal trong quá trình build image. Có thể có nhiều lệnh `RUN` liên tiếp nhau.
- - Chẳng hạn:
- ```
- RUN apt-get update 
- RUN apt-get install -y package-bar package-baz package-foo 
- RUN rm -rf /var/lib/apt/lists/*
- ```
- - Một lệnh RUN dài có thể xuống dòng để dễ đọc, dễ hiểu hơn bằng ký hiệu blash `\`:
- ```
- RUN apt-get update && apt-get install -y \
-    package-bar \
-    package-baz \
-    package-foo  \
-    && rm -rf /var/lib/apt/lists/*
- ```
+	- Chẳng hạn:
+	```
+	RUN apt-get update 
+	RUN apt-get install -y package-bar package-baz package-foo 
+	RUN rm -rf /var/lib/apt/lists/*
+	```
+	- Một lệnh RUN dài có thể xuống dòng để dễ đọc, dễ hiểu hơn bằng ký hiệu blash `\`:
+	```
+	RUN apt-get update && apt-get install -y \
+	package-bar \
+	package-baz \
+	package-foo  \
+	&& rm -rf /var/lib/apt/lists/*
+	```
  - Trong quá trình build một image thì mỗi lệnh RUN trong Dockerfile sẽ build thành một layer. Các layer sẽ giúp caching quá trình build và khi re-build sẽ nhanh hơn vì chỉ phải build lại bắt đầu từ dòng lệnh bị thay đổi và tận dụng các phần trước đó đã được caching.
  - Khi tách một lệnh RUN ghép thành nhiều lệnh RUN đơn, chúng ta sẽ có nhiều layer caching hơn và quá trình build sẽ nhanh hơn. Ví dụ trong 2 cách chạy lệnh RUN để thực hiện cùng một tác vụ như trên thì với cách chạy thứ 2 chúng ta sẽ phải chạy lại toàn bộ lệnh mỗi khi có một trong ba lệnh con thay đổi. Nhưng với cách chạy đầu tiên thì các lệnh sau thay đổi sẽ chỉ phải build lại từ dòng lệnh đó trở đi vì các dòng lệnh trước đã được lấy lại từ caching.
 
 - `LABEL`: Cung cấp thông tin về metadata cho image như tác giả, email, công ty,…
 - `EXPOSE`: Thiết lập port để access container sau khi nó khởi chạy.
 - `COPY`: Cú pháp chung của lệnh là này là `COPY <src> <dest>`. Lệnh này nhằm copy thư mục từ host (là máy mà chúng ta cài docker image) vào container. Ví dụ trên máy chúng ta có thư mục host_dir. Chúng ta muốn copy vào container tại địa chỉ tuyệt đối /app/.
- - `COPY /host_dir /app/`
- - Note: Nếu chúng ta lấy đường dẫn của `<dest>` là `/folder/` thì đây là đường dẫn tuyệt đối xuất phát từ `root`. Còn nếu chúng ta lấy đường dẫn của `<dest>` là `folder/` thì nó được xem như đường dẫn tương đối bắt đầu từ `<WORK_DIR>/folder/`. Đây là một kiến thức cơ bản nhưng lại là một trong những nguyên nhân gây lỗi khi build.
+	- `COPY /host_dir /app/`
+	- Note: Nếu chúng ta lấy đường dẫn của `<dest>` là `/folder/` thì đây là đường dẫn tuyệt đối xuất phát từ `root`. Còn nếu chúng ta lấy đường dẫn của `<dest>` là `folder/` thì nó được xem như đường dẫn tương đối bắt đầu từ `<WORK_DIR>/folder/`. Đây là một kiến thức cơ bản nhưng lại là một trong những nguyên nhân gây lỗi khi build.
 
 - `ADD`: `ADD` cũng làm nhiệm vụ tương tự như `COPY` nhưng nó hỗ trợ thêm 2 tính năng nữa là copy từ một link URL trực tiếp vào container và thứ hai là bạn có thể extract một tar file trực tiếp vào container.
 - `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
+	- Chẳng hạn chúng ta muốn khi run docker thì sẽ in ra địa chỉ `$HOME`. Chúng ta có thể thêm dòng lệnh:
+	```
+	CMD ["echo", "$HOME"]
+	```
+	- Ở đây `echo` chính là thành phần `executable` và `$HOME` là `param` được truyền vào
 
+- `ENTRYPOINT`: Cung cấp các lệnh mặc định cùng tham số khi thực thi container. Lệnh `CMD` và `ENTRYPOINT` sẽ có chức năng giống nhau, ngoại trừ `ENTRYPOINT` có thể lặp lại nhiều lần trong một Dockerfile trong khi `CMD` là duy nhất.
+- `ENV`: Thiết lập các biến environment cho docker image. Giá trị này sẽ tồn tại trong toàn bộ các build stage.
+- `VOLUME`: Mount folder từ máy host tới container.
+- `WORKDIR`: thay đổi thư mục làm việc hiện hành cho các lệnh thực thi như `RUN`, `CMD`, `ENTRYPOINT`, `COPY`, `ADD` ở phía sau nó. Lệnh này cũng giống như cd trong linux.
+- `ONBUILD`: Tạo một trigger như là một điểm chờ cho việc build image. Các lệnh phía sau lệnh `ONBUILD` sẽ không được thực thi cho đến khi image đó được sử dụng làm base image cho việc build một image khác thì các lệnh sau `ONBUILD` sẽ được được thực thi theo tuần tự.
+- `ARG`: Định nghĩa một argument được sử dụng trong quá trình `docker build`. Nó tương tự như argument parser trong python.
+	- Giả sử ta có:
+	 ```
+	 from alpine
+	 ARG USER
+	 RUN echo $USER
+	 ```
+	Khi chạy docker build: `docker build --build-arg USER=maivanhoa .`
+	- `ARG` sẽ không tồn tại trong nhiều `build stage`, do đó ở các stage tiếp theo muốn sử dụng chúng ta phải định nghĩa lại chúng.
+	 ```
+	 from busybox
+	 ARG SETTINGS
+	 RUN ./run/setup $SETTINGS
 
-
-
+	 # Re-define in next stage
+	 FROM busybox
+	 ARG SETTINGS
+	 RUN ./run/other $SETTINGS
+	 ```
 
 
 
