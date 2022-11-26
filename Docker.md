@@ -82,6 +82,22 @@ Docker sử dụng kiến trúc client-server. Docker server (hay còn gọi là
 
 
 # Một số lệnh Docker cơ bản:
+
+- Chú ý: Giả sử ta có hai command:
+```
+docker run httpd
+docker container run httpd
+```
+Cả hai command trên đều tương tự như nhau. Các bạn có thể chọn một trong hai. Bản thân mình thì thường sử dụng command trên cho nó ngắn gọn.
+Vì đâu có sự tương đương này? Là do Docker v1.13 đã tái cấu trúc lại CLI.
+
+- Một số option hay sử dụng trong các command:
+	- `-d`: detach container (Có thể hiểu là chạy ngầm container cũng được). Ví dụ nếu không có option này chạy container, cửa sổ dòng lệnh phải giữ phiên. Nếu kết thúc cửa sổ dòng lệnh, container cũng stop theo.
+	- `-t`: Tạo một pseudo-TTY. Ví dụ nếu không có option này khi attach lại container thì sẽ không có cửa sổ dòng lệnh. (Nó có nghĩa là console, cho phép kết nối với terminal để tương tác)
+	- `-i`: giữ lại một STDIN kể cả khi detach, duy trì mở stdin để nhập lệnh. Ví dụ nếu không có option này khi attach lại container thì khi gõ command sẽ không có kết quả trả về. **Theo khuyến cáo thì nên sử dụng cả 3 option này theo dạng -itd đối với các command như: docker run, docker create …**
+
+- Docker làm việc, tương tác với các thành phần qua ID hoặc NAME
+
 0. Tìm kiếm images
 ```
 docker search <name_image>
@@ -97,51 +113,72 @@ hoặc lệnh thông tin chi tiết hơn:
 docker info
 ```
 
-2. Pull docker image từ docker hub:
-```
-docker pull <image_name:tag>
-```
-- `image_name`: là tên của docker image trên docker hub và tag là nhãn đánh dấu phiên bản của docker image. Mặt định không điền nhãn thì sẽ download bản `lasted`
 
-3. Liệt kê danh sách các `image` hiện đang có
-```
-docker images
-```
-- Cột IMAGE ID chính là index của image và là duy nhất, xóa một image sẽ dựa trên image id
+## Các câu lệnh với image
+-  Liệt kê danh sách các `image` hiện đang có: `docker images` hoặc `docker image ls`
+	- REPOSITORY: là kho chứa của một Image. Image này có thể có nhiều TAG
+	- TAG: TAG có thể hiểu là version của Image cũng được
+	- IMAGE ID: ID của Image, index của image và là duy nhất, xóa một image sẽ dựa trên image id
+	- CREATED: Thời gian tạo Image
+	- SIZE: Dung lượng của Image
 
-4. Xóa một image
-```
-docker rmi <image_id>
-#or
-docker image rm <image_id>
-```
+-  Pull docker image từ Registry (mặc định là docker hub): `docker pull <image_name:tag>`
+	- `image_name`: là tên của docker image trên docker hub và tag là nhãn đánh dấu phiên bản của docker image. Mặt định không điền nhãn thì sẽ download bản `lasted`
 
-5.  Run một docker image
-```
-docker run --name <container_name> -it --rm -p 8888:8888 -v $PWD:/tmp -w /tmp <image_name>
-```
-- `container_name`: tên của container sau khi được khởi tạo. Nếu không thiết lập tên thì docker sẽ sinh ra một tên mặc định cho nó.
-- `-it`: là lựa chọn bắt buộc khi run docker với interactive process (chẳng hạn shell)
-- `--rm`: sẽ xóa container sau khi exit docker
-- `-p {host_port}:{container_port}`: tùy chọn mapping port giữa host và container
-- `-v {host_directory}:{container_directory}`: là lệnh mount volumn giữa host với container. Trong lệnh trên chúng ta đã mount `current directory` trên host với thư mục `/tmp` của container. Sau khi mount thì dữ liệu giữa hai thư mục sẽ như nhau.
-- `-w` thay đổi thư mục làm việc của container về `/tmp`.
-- Khi chạy container nếu Image không có sẵn trong Docker host thì Docker sẽ tự động tải từ Registry về Docker host trước (tag mặc định là lastest).
+- Hiển thị chi tiết của một image: `docker inspect <image_name>`
+- Hiển thị lịch sử của image: `docker image history <image_name>:<tag>`
+- Tạo một tag mới từ image đang có: `docker image tag <image_name>:<tag1> <image_name>:<tag2>`
+- Save một image thành một file .tar. File này sẽ bao gồm các Layer sử dụng để tạo image đó, các file data dạng .json …: `docker image save -o /opt/my_image_file.tar <image_name>`
+- Tạo lại image bằng việc load lại file tar: `docker image load -i my_image_file.tar`
 
-6. Liệt kê danh sách các container đang chạy
-```
-docker container ls
-# or
-docker ps
-```
+-  Xóa một image: `docker rmi <image_id>` or `docker image rm <image_id>`
 
-7. Xóa một container
+## Các câu lệnh với container
+- Tạo mới một container nhưng không start
 ```
-docker container rm <container_name>
+docker create [OPTION] <image_name>
 ```
-- Bình thường nếu chúng ta thêm argument `--rm` vào lệnh docker run thì container sẽ tự động remove sau khi exit. Nếu không thêm lựa chọn này thì container sẽ vẫn tồn tại và chiếm dụng tài nguyên của máy. Khi đó có thể xóa chúng bằng lệnh.
-- Trong đó `container_name` chính là cột `NAMES` mà chúng ta thấy ở lệnh docker `container ls`.
+Ví dụ: `docker create -itd centos`
 
+-  Tạo một container và start container đó luôn
+	```
+	docker run --name <container_name> -it --rm -p 8888:8888 -v $PWD:/tmp -w /tmp <image_name>
+	```
+	- `container_name`: tên của container sau khi được khởi tạo. Nếu không thiết lập tên thì docker sẽ sinh ra một tên mặc định cho nó.
+	- `-it`: là lựa chọn bắt buộc khi run docker với interactive process (chẳng hạn shell)
+	- `--rm`: sẽ xóa container sau khi exit docker
+	- `-p {host_port}:{container_port}`: tùy chọn mapping port giữa host và container
+	- `-v {host_directory}:{container_directory}`: là lệnh mount volumn giữa host với container. Trong lệnh trên chúng ta đã mount `current directory` trên host với thư mục `/tmp` của container. Sau khi mount thì dữ liệu giữa hai thư mục sẽ như nhau.
+	- `-w` thay đổi thư mục làm việc của container về `/tmp`.
+	- Khi chạy container nếu Image không có sẵn trong Docker host thì Docker sẽ tự động tải từ Registry về Docker host trước (tag mặc định là lastest).
+
+- Liệt kê danh sách các container đang được Docker quản lý
+	- Danh sách các container đang chạy: `docker container ls` or `docker ps`
+	- Danh sách tất cả các container: `docker ps -a`
+	
+-  Xóa một container
+	- Xóa container đã stop: `docker rm <container_name>`
+		- Bình thường nếu chúng ta thêm argument `--rm` vào lệnh docker run thì container sẽ tự động remove sau khi exit. Nếu không thêm lựa chọn này thì container sẽ vẫn tồn tại và chiếm dụng tài nguyên của máy. Khi đó có thể xóa chúng bằng lệnh.
+		- Trong đó `container_name` chính là cột `NAMES` mà chúng ta thấy ở lệnh `docker ps`.
+
+	- Xóa container chưa stop: `docker rm -f <container_name>`
+	- Xóa tất cả container đang stop: `docker prune`
+	- Xóa tất cả các container: `docker rm -f $(docker ps -aq)`
+
+- Start một container: `docker start <container_name>`
+- Stop một container: `docker stop <container_name>`
+- Restart container: `dockert restart <container_name>`
+- Pause (tạm dừng container): `docker pause <container_name>`
+- Kill container (kill ở đây giống như stop, container chỉ bị stop chứ không bị mất đi): `docker kill <container_name>`
+- Hiển thị thông tin chi tiết của container: `docker inspect <container_name>`
+- Hiển thị log của container: `docker logs <container_name>`
+- Hiển thị tài nguyên đang sử dụng của container: `docker stats <container_name>`
+- Hiển thị các tiến trình đang chạy trong container: `docker top <container_name>`
+- Hiển thị các port mapping hoặc một port mapping cụ thể: `docker port <container_name>`
+- Attach container: Attach một màn hình cho phép nhập input và hiển thị output đối với một container đang chạy: `docker attach <container_name>`
+- Thực thi một câu lệnh trong container đang chạy: `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]`
+- Đổi tên container: `docker rename <old_name> <new_name>`
+- 
 
 # Build docker
 ## Build một image
@@ -237,7 +274,50 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 	 RUN ./run/other $SETTINGS
 	 ```
 
+# Ví dụ minh họa
+## Tạo images httpd với Dockerfile
+- Tạo folder làm việc với Dockerfile
+```
+cd ~
+mkdir build_image && cd build_image
+```
+- Tạo Dockerfile: `touch Dockerfile` 
+	> Filename phải là Dockerfile và không có phần mở rộng)
+	- Nội dung của Dockerfile như sau:
+	```
+	FROM centos:centos7
 
+	LABEL "image-type"="hoa-mv"
+	MAINTAINER hoamvm
+	
+	RUN yum update -y
+	RUN yum install httpd -y
+
+	ENV source /var/www/html/
+
+	VOLUME ["/var/log/httpd"]
+
+	COPY index.html ${source}
+	COPY start.sh /start.sh
+
+	RUN chmod +x /start.sh
+	CMD ["/start.sh"]
+
+	EXPOSE 80
+	```
+	- Giải thích:
+		- FROM centos:centos7: Build image dựa trên image gốc là centos 7.
+		- LABEL “image-type”=”huy-test”: Metadata của image có thể có hoặc không.
+		- MAINTAINER huytm: Tác giả viết Dockerfile để build image có thể có hoặc không.
+		- RUN yum update -y và RUN yum install httpd -y: Thực hiện các command của centos để update và cài đặt httpd
+		- ENV source /var/www/html/ : Khai báo một biến môi trường tên là source và có giá trị là /var/www/html/. Biến này sẽ được sử dụng ở bước COPY index.html ${source}
+		- VOLUME [“/var/log/httpd”]: Chỉ định một phân vùng trên Docker host mount với container khi chạy. Ở đây mình mount theo dạng volume. Mount folder /var/log/httpd của container với volume nằm tại /var/lib/portal/volume/ của Docker host
+		- COPY index.html ${source}: Copy file index.html từ Dockerhost vào đường dẫn biến - được khai báo ở bước trên.
+		- COPY start.sh /start.sh: Copy một bash script file vào đường dẫn / để thực hiện một số Linux command khi khởi tạo container từ image này.
+		- RUN chmod +x /start.sh: Cho phép quyền thực thi đối với script vừa copy từ bước trên.
+		- CMD [“/start.sh”]: Thực thi script khi khởi chạy container từ image này.
+		- EXPOSE 80: Chỉ ra rằng container khi khởi chạy từ image này sẽ LISTEN port 80
+		
 
 
 
