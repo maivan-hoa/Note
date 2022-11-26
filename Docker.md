@@ -237,7 +237,7 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 	- Note: Nếu chúng ta lấy đường dẫn của `<dest>` là `/folder/` thì đây là đường dẫn tuyệt đối xuất phát từ `root`. Còn nếu chúng ta lấy đường dẫn của `<dest>` là `folder/` thì nó được xem như đường dẫn tương đối bắt đầu từ `<WORK_DIR>/folder/`. Đây là một kiến thức cơ bản nhưng lại là một trong những nguyên nhân gây lỗi khi build.
 
 - `ADD`: `ADD` cũng làm nhiệm vụ tương tự như `COPY` nhưng nó hỗ trợ thêm 2 tính năng nữa là copy từ một link URL trực tiếp vào container và thứ hai là bạn có thể extract một tar file trực tiếp vào container.
-- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Dùng để truyền một Linux command khi khởi tạo container từ image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
+- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Dùng để chạy một Linux command khi khởi tạo container từ image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
 	- Chẳng hạn chúng ta muốn khi run docker thì sẽ in ra địa chỉ `$HOME`. Chúng ta có thể thêm dòng lệnh:
 	```
 	CMD ["echo", "$HOME"]
