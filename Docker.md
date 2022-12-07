@@ -128,10 +128,11 @@ docker info
 - Hiển thị chi tiết của một image: `docker inspect <image_name>`
 - Hiển thị lịch sử của image: `docker image history <image_name>:<tag>`
 - Tạo một tag mới từ image đang có: `docker image tag <image_name>:<tag1> <image_name>:<tag2>`
-- Save một image thành một file .tar. File này sẽ bao gồm các Layer sử dụng để tạo image đó, các file data dạng .json …: `docker image save -o /opt/my_image_file.tar <image_name>`
-- Tạo lại image bằng việc load lại file tar: `docker image load -i my_image_file.tar`
+- Nếu muốn copy image ra máy khác ngoài cách đưa lên repository có thể lưu ra file .tar (file này sẽ bao gồm các Layer sử dụng để tạo image đó, các file data dạng .json …), lệnh sau lưu image có tên myimage ra file: `docker save --output myimage.tar myimage` hoặc `docker image save -o /opt/my_image_file.tar <image_name>`
+- Tạo lại image bằng việc load lại file tar: `docker image load -i my_image_file.tar` or `docker load -i myimage.tar`
 
--  Xóa một image: `docker rmi <image_id>` or `docker image rm <image_id>`
+- Xóa một image: `docker rmi <image_id>` or `docker image rm <image_id>`
+- Đổi tên một image đang có: `docker tag image_id imagename:version`
 
 ## Các câu lệnh với container
 - Tạo mới một container nhưng không start
@@ -165,7 +166,7 @@ Ví dụ: `docker create -itd centos`
 		- Bình thường nếu chúng ta thêm argument `--rm` vào lệnh docker run thì container sẽ tự động remove sau khi exit. Nếu không thêm lựa chọn này thì container sẽ vẫn tồn tại và chiếm dụng tài nguyên của máy. Khi đó có thể xóa chúng bằng lệnh.
 		- Trong đó `container_name` chính là cột `NAMES` mà chúng ta thấy ở lệnh `docker ps`.
 
-	- Xóa container chưa stop: `docker rm -f <container_name>`
+	- Xóa container chưa stop (container đang chạy): `docker rm -f <container_name>`
 	- Xóa tất cả container đang stop: `docker prune`
 	- Xóa tất cả các container: `docker rm -f $(docker ps -aq)`
 
@@ -180,9 +181,14 @@ Ví dụ: `docker create -itd centos`
 - Hiển thị các tiến trình đang chạy trong container: `docker top <container_name>`
 - Hiển thị các port mapping hoặc một port mapping cụ thể: `docker port <container_name>`
 - Attach container: Attach một màn hình cho phép nhập input và hiển thị output đối với một container đang chạy (quay quay trở lại terminal của container): `docker attach <container_name>`
-- Thực thi một câu lệnh trong container đang chạy: `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]`
+- Thực thi một câu lệnh trong container đang chạy (chạy lệnh bên ngoài máy host, không phải trong terminal của container): `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]`
 - Đổi tên container: `docker rename <old_name> <new_name>`
-- Thoát terminal nhưng vẫn giữ container chạy: `nhập lệnh exit hoặc CTRL +P hoặc CTRL + Q`
+- Thoát terminal nhưng vẫn giữ container chạy: `CTRL + P,Q`
+- Thoát terminal và dừng container: `gõ lệnh exit`
+
+- Một Image bạn có thể sinh ra các Container, mỗi Container là bản thực thi của Image, khi sử dụng Container bạn có thể cấu hình, cài đặt thêm vào nó các package, đưa thêm dữ liệu ... Đến một lúc, bạn muốn lưu những thay đổi này và ghi lại thành một Image để sau này bạn sinh ra các Container khác bản thân nó đã chữa những thay đổi bạn đã lưu. Giả sử bạn có một container có tên (hoặc id) là mycontainer nếu muốn lưu thành image thực hiện lệnh: `docker commit mycontainer myimage:version`
+	- Trong đó myimage và version là tên và phiên bản do bạn đặt. Nếu lưu cùng tên với image tạo ra container này, coi như image cũ được cập nhật mới.
+	- Để lưu container lại thành image: trước tiên nếu container đang chạy thì cho dừng lại: `docker stop mycontainer`
 
 # Build docker
 ## Build một image
