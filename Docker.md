@@ -155,6 +155,10 @@ Ví dụ: `docker create -itd centos`
 - Liệt kê danh sách các container đang được Docker quản lý
 	- Danh sách các container đang chạy: `docker container ls` or `docker ps`
 	- Danh sách tất cả các container: `docker ps -a`
+		- CONTAINER ID một con số (mã hash) gán cho container, bạn dùng mã này để quản lý container này, như xóa bỏ, khởi động, dừng lại ...
+		- IMAGE cho biết container sinh ra từ image nào.
+		- COMMAND cho biết lệnh, ứng dụng chạy khi container chạy (/bin/bash là terminate)
+		- STATUS cho biết trạng thái, (exit - đang dừng)
 	
 -  Xóa một container
 	- Xóa container đã stop: `docker rm <container_name>`
@@ -175,10 +179,10 @@ Ví dụ: `docker create -itd centos`
 - Hiển thị tài nguyên đang sử dụng của container: `docker stats <container_name>`
 - Hiển thị các tiến trình đang chạy trong container: `docker top <container_name>`
 - Hiển thị các port mapping hoặc một port mapping cụ thể: `docker port <container_name>`
-- Attach container: Attach một màn hình cho phép nhập input và hiển thị output đối với một container đang chạy: `docker attach <container_name>`
+- Attach container: Attach một màn hình cho phép nhập input và hiển thị output đối với một container đang chạy (quay quay trở lại terminal của container): `docker attach <container_name>`
 - Thực thi một câu lệnh trong container đang chạy: `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]`
 - Đổi tên container: `docker rename <old_name> <new_name>`
-- 
+- Thoát terminal nhưng vẫn giữ container chạy: `nhập lệnh exit hoặc CTRL +P hoặc CTRL + Q`
 
 # Build docker
 ## Build một image
