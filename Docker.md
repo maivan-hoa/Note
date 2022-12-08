@@ -133,6 +133,7 @@ docker info
 
 - Xóa một image: `docker rmi <image_id>` or `docker image rm <image_id>`
 - Đổi tên một image đang có: `docker tag image_id imagename:version`
+- trong quá trình Docker build image mới từ Dockerfile, có thể tạo ra các image tạm thời gây rác hệ thống. Để xóa các image tạm này hãy dùng lệnh: `docker image prune`
 
 ## Các câu lệnh với container
 - Tạo mới một container nhưng không start
@@ -143,12 +144,12 @@ Ví dụ: `docker create -itd centos`
 
 -  Tạo một container và start container đó luôn
 	```
-	docker run --name <container_name> -it --rm -p 8888:8888 -v $PWD:/tmp -w /tmp <image_name>
+	docker run --name <container_name> -it --rm -p 8888:80 -v $PWD:/tmp -w /tmp <image_name>
 	```
 	- `container_name`: tên của container sau khi được khởi tạo. Nếu không thiết lập tên thì docker sẽ sinh ra một tên mặc định cho nó.
 	- `-it`: là lựa chọn bắt buộc khi run docker với interactive process (chẳng hạn shell)
 	- `--rm`: sẽ xóa container sau khi exit docker
-	- `-p {host_port}:{container_port}`: tùy chọn mapping port giữa host và container
+	- `-p {host_port}:{container_port}`: tùy chọn ánh xạ port giữa host và container. Giả sử trong image này chỉ định khi thiết lập container, container sẽ thực hiện lắng nghe ở cổng 80. Ta cần ánh xạ cổng này tương ứng với một cổng trong HOST, ta có thể để cổng tương ứng của HOST là 80 hoặc 8888 như ví dụ trên
 	- `-v {host_directory}:{container_directory}`: là lệnh mount volumn giữa host với container. Trong lệnh trên chúng ta đã mount `current directory` trên host với thư mục `/tmp` của container. Sau khi mount thì dữ liệu giữa hai thư mục sẽ như nhau.
 	- `-w` thay đổi thư mục làm việc của container về `/tmp`.
 	- Khi chạy container nếu Image không có sẵn trong Docker host thì Docker sẽ tự động tải từ Registry về Docker host trước (tag mặc định là lastest).
@@ -220,7 +221,7 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 ```
 
 ## Các lệnh trong file Dockerfile
-- `FROM`: Lệnh này thường được sử dụng đầu Dockerfile để khởi tạo một build stage từ base image. Base image được lấy từ Dockerhub - Repository thường là những image có kích thước rất nhẹ và phù hợp với mục đích mà ta cần build.
+- `FROM`: Lệnh này thường được sử dụng đầu Dockerfile để khởi tạo một build stage từ base image. Base image được lấy từ Dockerhub - Repository thường là những image có kích thước rất nhẹ và phù hợp với mục đích mà ta cần build. Để xây dựng image từ image cơ sở nào đó thì bạn cần đọc document của Image đó để biết trong đó đang chứa gì, có thể chạy các lệnh gì trong đó ... Ví dụ, nếu bạn chọn xây dựng từ image centos:laste thì bạn bắt đầu bằng hệ điều hành CentOS và bạn có thể cài đặt, cập nhật các gói với yum, ngược lại nếu bạn chọn ubuntu:latest thì trình quản lý gói của nó là APT ...
 - `RUN`: thực hiện một câu lệnh Linux. Tùy vào image gốc mà có các câu lệnh tương ứng. Sẽ thực thi các lệnh terminal trong quá trình build image. Có thể có nhiều lệnh `RUN` liên tiếp nhau.
 	- Chẳng hạn:
 	```
@@ -241,13 +242,13 @@ docker build --no-cache -t hello:v2 -f dockerfiles/Dockerfile context
 
 - `LABEL`: Cung cấp thông tin về metadata cho image như tác giả, email, công ty,…. Để xem được các label này sử dụng câu lệnh `docker inspect <IMAGE ID>`
 - `MAINTERNER`: là author (tác giả) build image đó
-- `EXPOSE`: Thiết lập port để access container sau khi nó khởi chạy. (chỉ định các port sẽ Listen trong container khi khởi chạy container từ image)
+- `EXPOSE`: thiết lập cổng mà container lắng nghe, cho phép các container khác trên cùng mạng liên lạc qua cổng này hoặc để ánh xạ cổng host vào cổng này.. (chỉ định các port sẽ Listen trong container khi khởi chạy container từ image)
 - `COPY`: Cú pháp chung của lệnh là này là `COPY <src> <dest>`. Lệnh này nhằm copy thư mục từ host (là máy mà chúng ta cài docker image) vào image trong quá trình build image. Ví dụ trên máy chúng ta có thư mục host_dir. Chúng ta muốn copy vào image tại địa chỉ tuyệt đối /app/.
 	- `COPY /host_dir /app/`
 	- Note: Nếu chúng ta lấy đường dẫn của `<dest>` là `/folder/` thì đây là đường dẫn tuyệt đối xuất phát từ `root`. Còn nếu chúng ta lấy đường dẫn của `<dest>` là `folder/` thì nó được xem như đường dẫn tương đối bắt đầu từ `<WORK_DIR>/folder/`. Đây là một kiến thức cơ bản nhưng lại là một trong những nguyên nhân gây lỗi khi build.
 
 - `ADD`: `ADD` cũng làm nhiệm vụ tương tự như `COPY` nhưng nó hỗ trợ thêm 2 tính năng nữa là copy từ một link URL trực tiếp vào container và thứ hai là bạn có thể extract một tar file trực tiếp vào container.
-- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Dùng để chạy một Linux command khi khởi tạo container từ image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
+- `CMD`: Là câu lệnh được thực thi mặc định trong docker image. `CMD` sẽ không thực thi trong quá trình build image. Dùng để chạy lệnh Linux khi khởi tạo container từ image. Một file sẽ chỉ cần một lệnh `CMD` duy nhất. Cấu trúc của `CMD` là `CMD ["executable", "param1", "param2"…]` hoặc `CMD ["param1", "param2"…]`.
 	- Chẳng hạn chúng ta muốn khi run docker thì sẽ in ra địa chỉ `$HOME`. Chúng ta có thể thêm dòng lệnh:
 	```
 	CMD ["echo", "$HOME"]
@@ -328,18 +329,119 @@ mkdir build_image && cd build_image
 		- CMD [“/start.sh”]: Thực thi script khi khởi chạy container từ image này.
 		- EXPOSE 80: Chỉ ra rằng container khi khởi chạy từ image này sẽ LISTEN port 80
 		
+	```
 
 
+#**--> CHÚ Ý: Giảm số lượng layer hình thành nên Image**
+- Giả sử ta tạo image từ Dockerfile:
+```
+# xây dựng image mới từ image centos:latest (CENTOS 7)
+FROM centos:latest
 
+# Cập nhật các gói và cài vào đó HTTPD, HTOP, VIM
+RUN yum update -y
+RUN yum install httpd httpd-tools -y
+RUN yum install epel-release -y \
+    && yum update -y \
+    && yum install htop -y \
+    && yum install vim -y
 
+#Thiết lập thư mục hiện tại
+WORKDIR /var/www/html
+# Copy tất cả các file trong thư mục hiện tại (.)  vào WORKDIR
+ADD . /var/www/html
 
+#Thiết lập khi tạo container từ image sẽ mở cổng 80
+# ở mạng mà container nối vào
+EXPOSE 80
 
+# Khi chạy container tự động chạy ngay httpd
+ENTRYPOINT ["/usr/sbin/httpd"]
 
+#chạy terminate
+CMD ["-D", "FOREGROUND"]
+```
 
+- Khi hoàn thành build image bằng lệnh `docker build -t i-firstserver:version1 -f Dockerfile .`, ta kiểm tra các image có trong hệ thống bằng lệnh `docker images -a`, ta thu được:
+```
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+i-firstserver       version1            6a964f7f5321        About an hour ago   588MB
+<noned>             <none>              6a655bf3192b        About an hour ago   588MB
+<none>              <none>              bb535a125b19        About an hour ago   588MB
+<none>              <none>              e43cbe953b7d        About an hour ago   588MB
+<none>              <none>              5f8bda4bcb01        About an hour ago   588MB
+<none>              <none>              6d8ae47da227        About an hour ago   588MB
+<none>              <none>              bc535a902e02        About an hour ago   411MB
+<none>              <none>              ac7b46806e10        About an hour ago   296MB
+```
+- Như đã thấy, để có image cuối cùng thì Docker cũng đã sinh ra tới 7 image khác, image đầu tiên ac7b46806e10 được kế thừa bới bc535a902e02 cứ như vậy đến cho đến image cuối i-firstserver. Do tính kế thừa, như vậy nên các image cha không thể xóa được hoặc nếu vẫn muốn loại bỏ thì bạn có thể xuất image cuối ra file, rồi xóa image này đi, sau đó nạp image lại từ file. Tuy nhiên một mẹo nhỏ có thể gộp các lớp cha của vào thành một.
 
+- Cố gắng xây dựng Image có ít layer nhất:
+	- Gõ lệnh xem lịch sử hình thành image `i-firstserver:version1`:
+	```
+	IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+	6a964f7f5321        About an hour ago   /bin/sh -c #(nop)  CMD ["-D" "FOREGROUND"]      0B
+	e43cbe953b7d        About an hour ago   /bin/sh -c #(nop)  ENTRYPOINT ["/usr/sbin/ht…   0B
+	bb535a125b19        About an hour ago   /bin/sh -c #(nop)  EXPOSE 80                    0B
+	6a655bf3192b        About an hour ago   /bin/sh -c #(nop) ADD dir:519c5971b42e7e73b1…   1.49kB
+	5f8bda4bcb01        About an hour ago   /bin/sh -c #(nop) WORKDIR /var/www/html         0B
+	6d8ae47da227        About an hour ago   /bin/sh -c yum install epel-release -y     &…   177MB
+	bc535a902e02        About an hour ago   /bin/sh -c yum install httpd httpd-tools -y     116MB
+	ac7b46806e10        About an hour ago   /bin/sh -c yum update -y                        94MB
+	9f38484d220f        13 days ago         /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B
+	```
+	- Hãy nhìn từ dưới lên trên, đó là quá trình hình thành nên Image khi bạn build từ Docker file:
+		- Đầu tiên nó tải centos:latest về và chạy nó, lưu thành image 9f38484d220f
+		- Tiếp theo chạy lệnh yum update -y cập nhật các package, xong lưu thành image với id ac7b46806e10
+		- Cứ như vậy, sau các chỉ thị trong Dockerfile thì một Image lại được lưu lại cho đến Image cuối cùng có tên bạn tạo!
+	- Từ đó bạn nhận thấy: Trong Dockerfile có bao nhiêu chỉ thị RUN thì có bấy nhiêu layer được tạo ra, tương tự là ADD, ENTRYPOINT, CMD ... Nên muốn ít layer thì cần viết sao cho ít chỉ thị nhất. Ở ví dụ trên:
+		- thay vì có 3 chỉ thị RUN có thể viết thành 1 như vậy 3 layer chỉ còn 1
+		- WORKDIR chưa dùng đến bỏ đi (giảm 1 layer)
+		- Tham số ENTRYPOINT có thể viết gộp cùng lệnh CMD, thay vì phải dùng thêm CMD (giảm 1 layer).
+		```
+		FROM centos:latest
 
+		RUN yum update -y \
+		    && yum install httpd httpd-tools -y \
+		    && yum install epel-release -y \
+		    && yum update -y \
+		    && yum install htop -y \
+		    && yum install vim -y
 
+		ADD . /var/www/html
 
+		EXPOSE 80
+
+		ENTRYPOINT ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+		```
+		
+		- Cuối cùng file Dockerile ở trên vẫn cùng kết quả nhưng sinh ra ít layer. Dù vậy, vẫn còn 3 Image không tên, không tag.
+
+# Chia sẻ dữ liệu giữa Docker Host và Container
+Máy Host là hệ thống bạn đang chạy Docker Engine. Một thư mục của máy Host có thể chia sẻ để các Container đọc, lưu dữ liệu
+
+### Chia sẻ dữ liệu giữa Host và Container
+Thông tin:
+- Thư mục cần chia sẻ dữ liệu trên máy host là: `path_in_host`
+- Khi chạy container, thư mục đó được mount - ánh xạ tới `path_in_container` của container
+- Để có kết quả đó, tạo / chạy container với tham số thêm vào `-v path_to_data:path_in_container`
+- Ví dụ:
+```
+docker run -it -v /home/sitesdata:/home/data ubuntu
+```
+- `ubuntu` ở ví dụ trên là tên của image
+- Lúc này, dữ liệu trên thư mục `/home/sitesdata/` của máy Host thì trong container có thể truy cập, cập nhật sửa đổi ... thông qua đường dẫn `/home/data`
+- Xóa container thì thư mục `/home/sitesdata/` vẫn tồn tại trên máy Host
+- 
+### Chia sẻ dữ liệu giữa các Container
+- Giả sử ta đã tạo một container có tên là `container_first` từ image centOS, trong đó dữ liệu trên thư mục `/home/sitesdata/` của máy Host thì trong `container_first` có thể truy cập, cập nhật sửa đổi ... thông qua đường dẫn `/home/data`
+- Ta muốn tạo một container khác có tên `container_second` từ image ubuntu với điều kiện `container_second` này cũng có thể mout tới thư mục `/home/sitesdata/` thông qua đường dẫn `/home/data` như `container_first`, ta dùng lệnh sau:
+```
+docker run -it --name container_second --volumes-from container_first ubuntu
+```
+
+### Quản lý các ổ đĩa với docker volume
+- Phần này xem video sẽ dể hiểu hơn: `https://youtu.be/DSP2-ip38Zw?t=423`
 
 
 
