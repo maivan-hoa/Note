@@ -332,7 +332,7 @@ mkdir build_image && cd build_image
 	```
 
 
-#**--> CHÚ Ý: Giảm số lượng layer hình thành nên Image**
+# --> CHÚ Ý: Giảm số lượng layer hình thành nên Image
 - Giả sử ta tạo image từ Dockerfile:
 ```
 # xây dựng image mới từ image centos:latest (CENTOS 7)
