@@ -329,7 +329,6 @@ mkdir build_image && cd build_image
 		- CMD [“/start.sh”]: Thực thi script khi khởi chạy container từ image này.
 		- EXPOSE 80: Chỉ ra rằng container khi khởi chạy từ image này sẽ LISTEN port 80	
 	```
-
 # --> CHÚ Ý: Giảm số lượng layer hình thành nên Image
 - Giả sử ta tạo image từ Dockerfile:
 ```
