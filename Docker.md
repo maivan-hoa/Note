@@ -327,10 +327,8 @@ mkdir build_image && cd build_image
 		- COPY start.sh /start.sh: Copy một bash script file vào đường dẫn / để thực hiện một số Linux command khi khởi tạo container từ image này.
 		- RUN chmod +x /start.sh: Cho phép quyền thực thi đối với script vừa copy từ bước trên.
 		- CMD [“/start.sh”]: Thực thi script khi khởi chạy container từ image này.
-		- EXPOSE 80: Chỉ ra rằng container khi khởi chạy từ image này sẽ LISTEN port 80
-		
+		- EXPOSE 80: Chỉ ra rằng container khi khởi chạy từ image này sẽ LISTEN port 80	
 	```
-
 
 # --> CHÚ Ý: Giảm số lượng layer hình thành nên Image
 - Giả sử ta tạo image từ Dockerfile:
