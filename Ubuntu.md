@@ -197,7 +197,7 @@ nohup command
 ```
 - Một khi bạn đã chạy lệnh ở trên, tất cả output cùng với thông báo lỗi sẽ được thêm vào file nohup.out trong thư mục home hoặc trong thư mục hiện tại bạn đang đứng để chạy lệnh trên. Bây giờ, nếu shell bị đóng hoặc bạn logout ra khỏi hệ thống, lệnh được thực thi ở trên sẽ không bị chấm dứt.
 
-- Để chạy và đặt process vào chế độ chạy ngầm, bạn cần phải sử dụng lệnh nohup như sau: `nohup command &`
+- Để chạy và đặt process vào chế độ chạy ngầm, bạn cần phải sử dụng lệnh nohup như sau: `nohup command &` (khi ấn Ctrl + C thì chương trình vẫn chạy tiếp, ta có thể sử dụng terminal cho mục đích khác)
 - Ký tự & nói cho shell biết rằng nó cần chạy lệnh ở chế độ chạy ngầm. Tương tự như lệnh nohup ở trên ngoại trừ khi session kết thúc, nó ngay lập tức trả về dấu nhắc shell
 
 - Mặc định, ouput của lệnh nohup được thêm vào file nohup.out. Để chuyển hướng output này tới file khác, sử dụng toán tử chuyển hướng “>” theo sau bởi tên file cụ thể. Ví dụ, bạn sử dụng lệnh dưới đây để lưu output của lệnh nohup tới một file mới có tên “autoscript.log”.
