@@ -186,14 +186,24 @@ shutdown -r now
   - tức là thêm quyền excute cho thằng owner của thư mục.
 
 
+# Một số lệnh hữu ích
+1. `nohup`
+- Giúp chương trình của bạn vẫn chạy kể cả khi bạn thoát hoặc bị thoát khỏi cửa sổ Shell
+- Nohup (viết tắt của từ no hangup) là lệnh bỏ qua tín hiệu HUP. Có thể bạn đang băn khoăn tín hiệu HUP là gì. Cụ thể, nó là tín hiệu được gửi đến một process khi shell được liên kết tới nó bị chấm dứt. Thường thì, khi chúng ta logout, khi đó tất cả các chương trình và process đang chạy sẽ bị treo hoặc bị dừng lại. Nếu chúng ta muốn tiếp tục chạy các process thậm chí cả sau khi đã logout hoặc ngắt kết nối khỏi shell hiện tại, khi đó chúng ta có thể sử dụng lệnh nohup. Nó làm cho các process miễn nhiễm  với tín hiệu HUP để làm cho chương trình luôn chạy thậm chí cả khi bạn đã logout. Với nohup, bạn sẽ không cần phải đăng nhập vào hệ thống trong thời gian dài để chờ process chạy đến khi hoàn tất.
 
+- Nếu bạn muốn giữ cho process chạy liên tục thậm chí cả khi bạn đã thoát khỏi shell, sử dụng lệnh nohup với lệnh chạy process đi kèm như sau:
+```
+nohup command
+```
+- Một khi bạn đã chạy lệnh ở trên, tất cả output cùng với thông báo lỗi sẽ được thêm vào file nohup.out trong thư mục home hoặc trong thư mục hiện tại bạn đang đứng để chạy lệnh trên. Bây giờ, nếu shell bị đóng hoặc bạn logout ra khỏi hệ thống, lệnh được thực thi ở trên sẽ không bị chấm dứt.
 
-
-
-
-
-
-
+- Mặc định, ouput của lệnh nohup được thêm vào file nohup.out. Để chuyển hướng output này tới file khác, sử dụng toán tử chuyển hướng “>” theo sau bởi tên file cụ thể. Ví dụ, bạn sử dụng lệnh dưới đây để lưu output của lệnh nohup tới một file mới có tên “quangvu.sh”.
+```
+nohup ./vu.sh > quangvu.sh &
+```
+- Để chạy và đặt process vào chế độ chạy ngầm, bạn cần phải sử dụng lệnh nohup như sau: `nohup command &`
+- Ký tự & nói cho shell biết rằng nó cần chạy lệnh ở chế độ chạy ngầm. Tương tự như lệnh nohup ở trên ngoại trừ khi session kết thúc, nó ngay lập tức trả về dấu nhắc shell
+- Để chấm dứt một process đang chạy ngầm, sử dụng lệnh kill như sau: `kill -9 PID` hoặc `kill PID`. Bạn sẽ thấy PID của process khi sử dụng nohup với “&”.
 
 
 
