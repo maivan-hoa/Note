@@ -41,6 +41,7 @@ print(sys.path)
 - Giả sử ta có cấu trúc thư mục:
 ```
 --utils
+  |  |---__init__.py
   |  |---A.py (trong file này có hàm a())
   |
   example.py
@@ -68,9 +69,29 @@ res = A.a()
 - os.path.dirname(__file__) returns the absolute path to the current working directory
 - Sử dụng sys.path.append để thêm đường dẫn đến module A cần tìm kiếm
 
-# 
+## __init__.py
+- Nếu ta có đoạn code trong file example.py
+```
+import utils
 
+res = utils.A.a()
+```
+--> đoạn code này sẽ gây ra lỗi bởi interpreter không biết utils là package
 
+- Ta có thể xử lý trường hợp này bằng cách sử dụng file __init__.py với nội dung:
+```
+from .A import a
+```
+hoặc
+```
+from utils.A import a
+```
+- Sau đó, trong file example.py, ta có thể sử dụng code:
+```
+import utils
+
+res = utils.a()
+```
 
 
 
