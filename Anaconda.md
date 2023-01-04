@@ -8,3 +8,18 @@
 	- Gõ yes để kết thúc cài đặt
 
 3. Activate installation: `source ~/.bashrc`
+
+
+# Các lệnh với Anaconda
+- `conda info`
+- `conda env list`
+- Tạo môi trường: `conda create ––name name_environment python=3`
+- Activate môi trường: `conda activate name_environment`
+
+
+
+
+
+
+
+
