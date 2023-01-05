@@ -24,7 +24,7 @@
 		- Export your active environment to a new file: `conda env export > environment.yml`
 	- Create the environment from the environment.yml file: `conda env create -f environment.yml`
 
-
+- `conda install --file requirements.txt`
 
 
 
