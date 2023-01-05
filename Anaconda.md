@@ -15,6 +15,7 @@
 - https://docs.conda.io/projects/conda/en/4.6.0/_downloads/52a95608c49671267e40c689e0bc00ca/conda-cheatsheet.pdf
 - `conda info`
 - `conda env list`
+- `conda list`
 - Tạo môi trường: `conda create ––name name_environment python=3`
 - Activate môi trường: `conda activate name_environment`
 - Xóa môi trường: `conda env remove --name name_environment`
