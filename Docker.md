@@ -464,6 +464,8 @@ docker run -it --name container_second --volumes-from container_first ubuntu
 		- Còn nếu chỉ muốn `up` một số services thì các bạn cứ đặt các service muốn chạy đằng sau lệnh `up` là được. Ví dụ như `docker-compose up -d redis sqlserver`
 	- `docker-compose down` dùng để dừng các container và xóa hết những gì được tạo từ lệnh `up`. Về cơ bản thì nó sẽ xóa bỏ những container và network được định nghĩa trong compose file.
 
+- Thực thi các lệnh bên trong một dịch vụ đang chạy trong Docker Compose: `docker-compose exec <service name> <command>`. (Không giống lệnh `container exec`, bạn không cần truyền cờ `-it` cho các phiên tương tác, `docker-compose` làm điều đó tự động)
+
 ## Example: Cấu trúc cơ bản của file YML trong Compose.
 - Giả sử ta có cấu trúc project:
 ```
