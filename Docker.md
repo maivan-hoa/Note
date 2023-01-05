@@ -441,6 +441,96 @@ docker run -it --name container_second --volumes-from container_first ubuntu
 - Phần này xem video sẽ dể hiểu hơn: `https://youtu.be/DSP2-ip38Zw?t=423`
 
 
+# Docker Compose
+-  Docker compose sẽ giúp bạn làm việc với Docker một cách hiệu quả hơn, đơn giản hóa các thao tác
+- Để dễ hình dùng thì chẳng bạn ứng dụng của bạn đang cần tạo docker cho DB, backend và frontend. Với Dockerfile, bạn sẽ có thể tạo được 1 container chứa tất cả mọi thứ vào trong đó. Tuy nhiên, việc nhét quá nhiều thứ vào Dockerfile sẽ gây ra nhiều vấn đề trong việc build image nếu bạn cần chỉnh sửa (tăng thời gian build chẳng hạn). Ngoài ra, một Dockerfile đảm nhận nhiều nhiệm vụ thì hoàn toàn không tốt chút nào với các principle KISS, SRP. Nếu bạn tách nó ra thành các Dockerfile riêng biệt để tránh các vấn đề trên thì việc chạy từng Dockerfile một cũng không thích hợp nếu như đó là hàng chục hoặc hàng trăm image. Ngoài ra, nếu bạn có một container cần dùng chung (chẳng hạn như DB) hay đơn giản là có thể hoạt động với mọi môi trường như dev, test, prod... thì Dockerfile không hề dễ để thực hiện.
+- Những tính năng chính của Compose bao gồm:
+	- Thiết lập và cấu hình đa môi trường container hoàn toàn độc lập nhau trên cùng một máy chủ
+	- Bảo lưu các phân vùng bộ nhớ khi container được tạo ra
+	- Chỉ tạo lại container nào có config thay đổi trong khi vẫn bảo lưu dữ liệu của container
+	- Cho phép định nghĩa các biến variables trong file YAML để tùy chỉnh cho các môi trường dev và product.
+
+- Với Compose, bạn sử dụng tệp YAML để định cấu hình các dịch vụ của ứng dụng. Sau đó, với một lệnh duy nhất, bạn tạo và khởi động tất cả các dịch vụ từ cấu hình của mình. Để sử dụng Compose thông thường có ba bước sau:
+	- Tạo Dockerfile cho mỗi môi trường container của từng service mình muốn. Dockerfile là bắt buộc để khởi tạo container.
+	- Tạo file docker-compose.yml để định nghĩa mối liên kết giữa các containers với nhau.
+	- Chạy lệnh docker-compose up để khởi động Compose và chạy toàn bộ ứng dụng.
+
+- Để có thể dùng được docker compose, bạn cần tạo một compose file như docker-compose.yml để thiết lập các container cần cho ứng dụng của bạn
+- Để build, run và stop các container, các bạn có thể sử dụng các command sau:
+	- `docker-compose build` dùng để build tất cả container được định nghĩa trong compose file. Tuy nhiên, mình hay sử dụng lệnh này để thực hiện build lại service vừa được thay đổi bằng lệnh sau `docker-compose build <servicename>`
+	- `docker-compose up` thực hiện tạo và khởi chạy các container. Các bạn có thể xem [ở đây](https://docs.docker.com/engine/reference/commandline/compose_up/) để thêm các options tương ứng với lệnh up. Về cơ bản thì bạn chỉ cần 2 option là `-d` và `--force-recreate`:
+		- Với `-d` thì các containers sẽ được chạy dưới dạng background. Detached mode chắc hẳn là không thể thiếu khi khởi chạy bất cứ service nào.
+		- Với `--force-recreate` thì bạn sẽ tái tạo lại các containers.
+		- Còn nếu chỉ muốn `up` một số services thì các bạn cứ đặt các service muốn chạy đằng sau lệnh `up` là được. Ví dụ như `docker-compose up -d redis sqlserver`
+	- `docker-compose down` dùng để dừng các container và xóa hết những gì được tạo từ lệnh `up`. Về cơ bản thì nó sẽ xóa bỏ những container và network được định nghĩa trong compose file.
+
+## Example: Cấu trúc cơ bản của file YML trong Compose.
+- Giả sử ta có cấu trúc project:
+```
+app/
+   commander/
+      Dockerfile
+   docker-compose.yml
+```
+- Bên trong folder `commander` ta có một file Dockerfile như sau để khởi tạo một container chạy redis commander, đây là một service dùng để visualize redis database. Nội dung của Dockerfile:
+```
+# create a nodejs container with minimum requirements
+FROM node:0.12.2
+
+# download and install redis-commander
+RUN curl -L https://github.com/joeferner/redis-commander/tarball/v0.3.2 | tar zx
+RUN npm install -g redis-commander
+
+# Run this command everytime this container start up
+ENTRYPOINT [ "redis-commander" ]
+CMD [ "--redis-host", "redis" ]
+
+EXPOSE 8081
+```
+
+- Nội dung của Docker-compose.yml:
+```
+version: '3'
+services: 
+  backend:
+    image: "redis:3"
+    restart: always
+
+  frontend: 
+    build: commander
+    links: 
+    - backend:redis  
+    ports: 
+    - 8081:8081 
+    restart: always
+```
+
+- File `Compose` trên đây xác định việc khởi tạo 2 services: `backend` và `frontend`.
+	- Backend service sử dụng public Redis image từ Docker Hub registry
+	- Frontend service:
+		- Sử dụng image của `redis-commander` đã được đĩnh nghĩa trong folder `commander`
+		- Links với backend service bằng alias redis
+		- Kết nối cổng 8081 trên container với cổng 8081 của máy chủ.
+
+- Tiếp theo ta build và run app với Compose bằng lệnh: `docker-compose up`. Câu lệnh `docker-compose up` chính là gộp của hai lệnh sau:
+```
+$ docker build -t commander commander
+$ docker run -d --name frontend -p 8081:8081 --link backend:redis commander
+```
+- Như vậy, với mỗi service mới được thêm vào hoặc chỉnh sửa, ngoài việc tạo Dockerfile cho service thì chỉ cần thêm vào trong docker-compose.yml, service mới sẽ được liên kết dễ dàng với database/service hiện tại.
+- Để kết thúc các services đang chạy, sử dụng lệnh: `docker-compose stop`
+- Và để xóa hoàn toàn container và data volume sử dụng bởi Redis container: `docker-compose down --volumes`
+
+
+
+
+
+
+
+
+
+
+
 
 
 
